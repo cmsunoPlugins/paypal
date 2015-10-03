@@ -1,0 +1,365 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: CmsUno\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-24 18:16+0100\n"
+"PO-Revision-Date: 2015-08-24 18:17+0100\n"
+"Last-Translator: jacques Malgrange <contacter@boiteasite.fr>\n"
+"Language-Team: Jacques Malgrange <contacter@boiteasite.fr>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Report-\tmsgstr-Bugs-To: \n"
+"Report-\t\tmsgstr-Bugs-To: \n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-Country: FRANCE\n"
+"X-Poedit-SourceCharset: iso-8859-1\n"
+"X-Poedit-Language: French\n"
+"X-Poedit-SearchPath-0: ../../..\n"
+
+#: ../../../ipn.php:95
+msgid "Thank you for your trust, see you soon!"
+msgstr "Merci pour votre confiance, à bientôt !"
+
+#: ../../../ipn.php:118
+msgid "Total"
+msgstr "Total"
+
+#: ../../../ipn.php:120
+msgid "Paid by Paypal"
+msgstr "Payé par Paypal"
+
+#: ../../../ipn.php:120
+#: ../../../paypal.php:183
+msgid "Name"
+msgstr "Nom"
+
+#: ../../../ipn.php:120
+#: ../../../paypal.php:183
+msgid "Address"
+msgstr "Adresse"
+
+#: ../../../ipn.php:120
+msgid "Mail"
+msgstr "Mail"
+
+#: ../../../ipn.php:124
+msgid "New order by Paypal"
+msgstr "Nouvelle commande avec Paypal"
+
+#: ../../../ipn.php:128
+msgid "Follow the evolution of your order"
+msgstr "Suivre l'évolution de votre commande"
+
+#: ../../../ipn.php:129
+msgid "Thank you for your trust."
+msgstr "Merci pour votre confiance."
+
+#: ../../../ipn.php:130
+msgid "Order"
+msgstr "Commande"
+
+#: ../../../ipn.php:146
+msgid "Payment receipt"
+msgstr "Réception d'un paiement"
+
+#: ../../../paypal.php:20
+#: ../../../paypal.php:268
+msgid "Archives"
+msgstr "Archives"
+
+#: ../../../paypal.php:21
+msgid "Configure Paypal plugin"
+msgstr "Configurer le plugin Paypal"
+
+#: ../../../paypal.php:21
+msgid "Config"
+msgstr "Configuration"
+
+#: ../../../paypal.php:22
+msgid "Sales list"
+msgstr "Liste des ventes"
+
+#: ../../../paypal.php:22
+msgid "Sales"
+msgstr "Ventes"
+
+#: ../../../paypal.php:23
+#: ../../../paypal.php:282
+msgid "Payment Details"
+msgstr "Détails du paiement"
+
+#: ../../../paypal.php:24
+msgid "Paypal"
+msgstr "Paypal"
+
+#: ../../../paypal.php:27
+msgid "This plugin allows you to add different Paypal buttons in your website."
+msgstr "Ce plugin permet d'ajouter différents boutons Paypal sur votre site."
+
+#: ../../../paypal.php:28
+msgid "It is used with the button"
+msgstr "Il s'utilise avec le bouton"
+
+#: ../../../paypal.php:28
+msgid "added to the text editor when the plugin is enabled."
+msgstr "ajouté à l'éditeur de texte lorsque le plugin est actif."
+
+#: ../../../paypal.php:29
+msgid "Create your account on"
+msgstr "Ouvrir un compte sur"
+
+#: ../../../paypal.php:30
+msgid "Default Settings :"
+msgstr "Réglages par défaut"
+
+#: ../../../paypal.php:33
+msgid "Email or Paypal ID"
+msgstr "Email ou ID Paypal"
+
+#: ../../../paypal.php:35
+msgid "Email address or Paypal ID for the Paypal account. Select the ID helps prevent SPAM."
+msgstr "Adresse email ou ID du marchand pour le compte Paypal. Choisir l'ID permet d'éviter les SPAM."
+
+#: ../../../paypal.php:38
+msgid "Currency"
+msgstr "Monnaie"
+
+#: ../../../paypal.php:41
+msgid "Euro"
+msgstr "Euro"
+
+#: ../../../paypal.php:42
+msgid "US Dollar"
+msgstr "Dollar USA"
+
+#: ../../../paypal.php:43
+msgid "Canadian Dollar"
+msgstr "Dollar Canadien"
+
+#: ../../../paypal.php:44
+msgid "Pound Sterling"
+msgstr "Livre Sterling"
+
+#: ../../../paypal.php:45
+msgid "Swiss Franc"
+msgstr "Franc suisse"
+
+#: ../../../paypal.php:46
+msgid "Danish Krone"
+msgstr "Couronne Danoise"
+
+#: ../../../paypal.php:47
+msgid "Norwegian Krone"
+msgstr "Couronne Norvégienne"
+
+#: ../../../paypal.php:48
+msgid "Swedish Krona"
+msgstr "Couronne Suédoise"
+
+#: ../../../paypal.php:49
+msgid "Polish Zloty"
+msgstr "Zloty Polonais"
+
+#: ../../../paypal.php:50
+msgid "Russian Ruble"
+msgstr "Rouble Russe"
+
+#: ../../../paypal.php:53
+msgid "What is the currency of payment."
+msgstr "Dans quelle monnaie s'effectue le paiement."
+
+#: ../../../paypal.php:56
+msgid "Tax rate (%)"
+msgstr "Taxe - TVA (%)"
+
+#: ../../../paypal.php:58
+msgid "Tax rate in your country for the payment (%). Will be added to prices."
+msgstr "Taux de taxe pour ce paiement. Attention, ce sera ajouté au prix. Non obligatoire."
+
+#: ../../../paypal.php:61
+msgid "Appearance"
+msgstr "Apparence"
+
+#: ../../../paypal.php:64
+#: ../../../paypal.php:70
+#: ../../../paypal.php:71
+#: ../../../paypal.php:72
+msgid "Standard with flags"
+msgstr "Standard avec mini-cartes"
+
+#: ../../../paypal.php:65
+msgid "Standard"
+msgstr "Standard"
+
+#: ../../../paypal.php:66
+msgid "Small"
+msgstr "Petit"
+
+#: ../../../paypal.php:76
+msgid "Selling"
+msgstr "Vente"
+
+#: ../../../paypal.php:79
+msgid "products"
+msgstr "produits"
+
+#: ../../../paypal.php:80
+msgid "services"
+msgstr "services"
+
+#: ../../../paypal.php:83
+msgid "Define what are you selling (only buy button)."
+msgstr "Préciser le type de vente que vous effectuez (bouton Acheter uniquement)"
+
+#: ../../../paypal.php:86
+msgid "Donation value"
+msgstr "Valeur des dons"
+
+#: ../../../paypal.php:89
+msgid "fixed"
+msgstr "fixe"
+
+#: ../../../paypal.php:90
+msgid "free"
+msgstr "libre"
+
+#: ../../../paypal.php:93
+msgid "Define a value for donation or let the client choose (only donate button)."
+msgstr "Valeur fixe pour les dons ou laisser le client choisir (bouton Don uniquement)"
+
+#: ../../../paypal.php:96
+msgid "Notify URL"
+msgstr "URL de notification"
+
+#: ../../../paypal.php:98
+msgid "Local File for Paypal Instant Payment Notification (IPN)"
+msgstr "Fichier local pour la notification instantannée de paiement par Paypal (IPN)"
+
+#: ../../../paypal.php:102
+msgid "Options :"
+msgstr "Options :"
+
+#: ../../../paypal.php:105
+msgid "External use"
+msgstr "Usage externe"
+
+#: ../../../paypal.php:107
+msgid "Use Paypal from another plugin : complete system with cart or digital product."
+msgstr "Utiliser Paypal depuis un autre plugin : système complet avec panier ou produit digital."
+
+#: ../../../paypal.php:111
+msgid "Publish Settings :"
+msgstr "Réglages pour la publication"
+
+#: ../../../paypal.php:114
+msgid "Mode"
+msgstr "Mode"
+
+#: ../../../paypal.php:117
+msgid "Production"
+msgstr "Production"
+
+#: ../../../paypal.php:118
+msgid "Test (sandbox)"
+msgstr "Test (Sandbox)"
+
+#: ../../../paypal.php:121
+msgid "When publishing : Production = Real payment ; Test = Dummy payment to test account."
+msgstr "Lors de la publication du site : Production = Paiements réels ; Test = Paiement fictifs avec un compte de test"
+
+#: ../../../paypal.php:124
+msgid "Popup"
+msgstr "Popup"
+
+#: ../../../paypal.php:127
+#: ../../../paypal.php:216
+msgid "No"
+msgstr "Non"
+
+#: ../../../paypal.php:128
+#: ../../../paypal.php:216
+msgid "Yes"
+msgstr "Oui"
+
+#: ../../../paypal.php:131
+msgid "Open Paypal in a new small windows. Allow visitor to keep an eye on your website."
+msgstr "Ouvre Paypal dans une nouvelle petite fenêtre. Permet au visiteur de conserver un oeil sur le site."
+
+#: ../../../paypal.php:134
+msgid "Save settings"
+msgstr "Sauvegarde des paramètres"
+
+#: ../../../paypal.php:134
+msgid "Save"
+msgstr "Sauvegarde"
+
+#: ../../../paypal.php:161
+msgid "Backup performed"
+msgstr "Sauvegarde effectuée"
+
+#: ../../../paypal.php:162
+msgid "Impossible backup"
+msgstr "Sauvegarde impossible"
+
+#: ../../../paypal.php:166
+msgid "List of the Paypal payments"
+msgstr "Liste des paiements Paypal"
+
+#: ../../../paypal.php:183
+msgid "Date"
+msgstr "Date"
+
+#: ../../../paypal.php:183
+msgid "Type"
+msgstr "Type"
+
+#: ../../../paypal.php:183
+msgid "Article"
+msgstr "Article"
+
+#: ../../../paypal.php:183
+msgid "Price"
+msgstr "Prix"
+
+#: ../../../paypal.php:183
+#: ../../../paypal.php:232
+msgid "Treated"
+msgstr "Traité"
+
+#: ../../../paypal.php:233
+#: ../../../paypal.php:238
+#: ../../../paypal.php:244
+#: ../../../paypal.php:293
+msgid "Error"
+msgstr "Erreur"
+
+#: ../../../paypal.php:237
+msgid "Restored"
+msgstr "Restauré"
+
+#: ../../../paypal.php:243
+msgid "Archived"
+msgstr "Archivé"
+
+#: ../../../paypal.php:274
+msgid "Restore"
+msgstr "Restaurer"
+
+#: ../../../paypal.php:289
+msgid "Are you sure ?"
+msgstr "Etes-vous certain ?"
+
+#: ../../../paypal.php:289
+msgid "Archive"
+msgstr "Archiver"
+
+#: ../../../paypalMake.php:36
+msgid "Shipping cost"
+msgstr "Frais de livraison"
+
+#: ../../../paypalMake.php:48
+msgid "Thank you for your payment"
+msgstr "Merci pour votre paiement"
