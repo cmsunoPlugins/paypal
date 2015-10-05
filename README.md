@@ -27,3 +27,5 @@ Very powerful.
 Adds a button in CKEditor to create  as many Paypal buttons as you need.
 Pay, Add to Cart, View Cart, Donate and Subscribe are available.
 Sales are checked and recorded with IPN return. Works also with digital goods.
+
+[CMSUno](https://github.com/boiteasite/cmsuno)
