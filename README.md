@@ -21,7 +21,7 @@ u::::::::::::::u  n::::n    n::::n  o:::::ooooo:::::o
      \____/           \/    \/            \__/
 </pre>
 
-### Paypal ###
+## Paypal ##
 
 Very powerful.
 Adds a button in CKEditor to create  as many Paypal buttons as you need.
@@ -29,3 +29,8 @@ Pay, Add to Cart, View Cart, Donate and Subscribe are available.
 Sales are checked and recorded with IPN return. Works also with digital goods.
 
 [CMSUno](https://github.com/boiteasite/cmsuno)
+
+### Versions ###
+
+* 1.0.1 - 07/10/2015 : Fix small display bug
+* 1.0 - 05/10/2015 : First stable version
