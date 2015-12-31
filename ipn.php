@@ -21,8 +21,6 @@ if($a)
 		$req .= "&$k=$v";
 		}
 	$ipn2 = json_encode($kv);
-	file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/tmp/test1'.$_POST['txn_id'].'.json', $ipn2);
-	file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/tmp/test2'.$_POST['txn_id'].'.json', $req);
 	//post back to PayPal system to validate
 	$header = "POST /cgi-bin/webscr HTTP/1.1\r\n";
 	$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
