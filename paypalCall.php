@@ -17,7 +17,7 @@ if (isset($_POST['action']))
 		$h = opendir($d);
 		while(($f=readdir($h))!==false)
 			{
-			if(is_file($d.$f) && substr(0,5,$f)=='digit' && filemtime($d.$f)<time()-86400) unlink($d.$f); // 24h
+			if(is_file($d.$f) && substr($f,0,5)=='digit' && filemtime($d.$f)<time()-86400) unlink($d.$f); // 24h
 			}
 		closedir($h);
 		break;
