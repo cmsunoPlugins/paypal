@@ -124,7 +124,7 @@ function f_paypalVente(){
 	document.getElementById('paypalC').className="bouton fr";
 	document.getElementById('paypalV').className="bouton fr current";
 	document.getElementById('paypalD').style.display="none";
-	jQuery.post('uno/plugins/paypal/paypal.php',{'action':'vente','unox':Unox},function(r){jQuery('#paypalVente').append(r);});
+	jQuery.post('uno/plugins/paypal/paypal.php',{'action':'vente','unox':Unox,'udep':Udep},function(r){jQuery('#paypalVente').append(r);});
 }
 function f_paypalDetail(f){
 	jQuery('#paypalDetail').empty();
@@ -140,6 +140,10 @@ function f_paypalDetail(f){
 		if(r.substr(0,1)!='!')jQuery('#paypalDetail').append(r);
 		else f_alert(r);
 	});
+}
+function f_supp_paypal(f,g){
+	f.parentNode.parentNode.removeChild(f.parentNode);
+	jQuery.post('uno/plugins/payplug/payplug.php',{'action':'suppsandbox','unox':Unox,'file':g},function(r){f_alert(r);});
 }
 //
 f_load_paypal();f_paypalVente();

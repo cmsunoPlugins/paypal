@@ -180,7 +180,7 @@ if (isset($_POST['action']))
 		if(count($tab))
 			{
 			echo '<br /><table>';
-			echo '<tr><th>'._("Date").'</th><th>'._("Type").'</th><th>'._("Name").'</th><th>'._("Address").'</th><th>'._("Article").'</th><th>'._("Price").'</th><th>'._("Treated").'</th></tr>';
+			echo '<tr><th>'._("Date").'</th><th>'._("Type").'</th><th>'._("Name").'</th><th>'._("Address").'</th><th>'._("Article").'</th><th>'._("Price").'</th><th>'._("Treated").'</th><th>'._("Del").'</th></tr>';
 			$b = array();
 			foreach($tab as $r)
 				{
@@ -208,12 +208,14 @@ if (isset($_POST['action']))
 						}
 					echo '<tr'.($r['treated']?' class="PayTreatedYes"':'').'>';
 					echo '<td>'.(isset($r['time'])?date("dMy H:i", $r['time']):'').'<br /><span style="font-size:.8em;text-decoration:underline;cursor:pointer;" onClick="f_paypalDetail(\''.$r['txn_id'].'\')">'.$r['txn_id'].'</span></td>';
-					echo '<td style="text-align:center">'.(isset($r['subscr_id'])?'Sub':((isset($r['quantity'])&&$r['quantity']=="0")?'Don':'Pay')).$typ.'</td>';
+					echo '<td style="text-align:center">'.(isset($r['subscr_id'])?'Sub':((isset($r['quantity'])&&$r['quantity']=="0")?'Don':'Pay')).$typ.'<br />'.((isset($r['IpnMethod'])&&$r['IpnMethod']=='not controled')?'<span style="font-size:.9em;color:#300;">'._("Unsafe").'</span>':'').'</td>';
 					echo '<td>'.$r['first_name'].'&nbsp;'.$r['last_name'].'<br />'.$r['payer_email'].'</td>';
 					echo '<td>'.$r['address_street'].'<br />'.$r['address_zip'].' - '.$r['address_city'].'<br />'.$r['address_state'].' - '.$r['address_country'].'</td>';
 					echo '<td>'.$item.'</td>';
 					echo '<td>'.$r['mc_gross'].' '.$r['mc_currency'].'</td>';
 					echo '<td '.(!$r['treated']?'onClick="f_treated_paypal(this,\''.$r['txn_id'].'\',\''._("Yes").'\')"':'').($r['treated']?'>'._("Yes"):' class="yesno">'._("No")).'</td>';
+					if(isset($r['test_ipn']) && $r['test_ipn']=='1' && isset($r['txn_id'])) echo '<td width="30px" style="cursor:pointer;background:transparent url(\''.$_POST['udep'].'includes/img/close.png\') no-repeat scroll center center;" onClick="f_supp_paypal(this,\''.$r['txn_id'].'\')">&nbsp;</td>';
+					else echo '<td></td>';
 					echo '</tr>';
 					}
 				}
@@ -289,6 +291,15 @@ if (isset($_POST['action']))
 			$o .= '<div class="bouton fr" '.((isset($a['treated']) && $a['treated']==0)?'style="display:none;"':'').' onClick="f_archivOrderPaypal(\''.$_POST['id'].'\',\''._("Are you sure ?").'\')" title="">'._("Archive").'</div>';
 			$o .= '<div style="clear:both;"></div>';
 			echo $o;
+			}
+		else echo '!'._('Error');
+		break;
+		// ********************************************************************************************
+		case 'suppsandbox':
+		if(file_exists('../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['file'].'.json'))
+			{
+			unlink('../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['file'].'.json');
+			echo _('Removed');
 			}
 		else echo '!'._('Error');
 		break;

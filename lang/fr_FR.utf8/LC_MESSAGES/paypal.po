@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CmsUno\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-24 18:16+0100\n"
-"PO-Revision-Date: 2015-08-24 18:17+0100\n"
+"POT-Creation-Date: 2016-04-02 12:39+0100\n"
+"PO-Revision-Date: 2016-04-02 12:44+0100\n"
 "Last-Translator: jacques Malgrange <contacter@boiteasite.fr>\n"
 "Language-Team: Jacques Malgrange <contacter@boiteasite.fr>\n"
 "Language: \n"
@@ -19,54 +19,65 @@ msgstr ""
 "X-Poedit-Language: French\n"
 "X-Poedit-SearchPath-0: ../../..\n"
 
-#: ../../../ipn.php:95
+#: ../../../ipn.php:151
+#: ../../../ipn-fsock.php:96
 msgid "Thank you for your trust, see you soon!"
 msgstr "Merci pour votre confiance, à bientôt !"
 
-#: ../../../ipn.php:118
+#: ../../../ipn.php:174
+#: ../../../ipn-fsock.php:119
 msgid "Total"
 msgstr "Total"
 
-#: ../../../ipn.php:120
+#: ../../../ipn.php:176
+#: ../../../ipn-fsock.php:121
 msgid "Paid by Paypal"
 msgstr "Payé par Paypal"
 
-#: ../../../ipn.php:120
+#: ../../../ipn.php:176
+#: ../../../ipn-fsock.php:121
 #: ../../../paypal.php:183
 msgid "Name"
 msgstr "Nom"
 
-#: ../../../ipn.php:120
+#: ../../../ipn.php:176
+#: ../../../ipn-fsock.php:121
 #: ../../../paypal.php:183
 msgid "Address"
 msgstr "Adresse"
 
-#: ../../../ipn.php:120
+#: ../../../ipn.php:176
+#: ../../../ipn-fsock.php:121
 msgid "Mail"
 msgstr "Mail"
 
-#: ../../../ipn.php:124
+#: ../../../ipn.php:180
+#: ../../../ipn-fsock.php:125
 msgid "New order by Paypal"
 msgstr "Nouvelle commande avec Paypal"
 
-#: ../../../ipn.php:128
+#: ../../../ipn.php:184
+#: ../../../ipn-fsock.php:129
 msgid "Follow the evolution of your order"
 msgstr "Suivre l'évolution de votre commande"
 
-#: ../../../ipn.php:129
+#: ../../../ipn.php:185
+#: ../../../ipn-fsock.php:130
 msgid "Thank you for your trust."
 msgstr "Merci pour votre confiance."
 
-#: ../../../ipn.php:130
+#: ../../../ipn.php:186
+#: ../../../ipn-fsock.php:131
 msgid "Order"
 msgstr "Commande"
 
-#: ../../../ipn.php:146
+#: ../../../ipn.php:202
+#: ../../../ipn-fsock.php:147
 msgid "Payment receipt"
 msgstr "Réception d'un paiement"
 
 #: ../../../paypal.php:20
-#: ../../../paypal.php:268
+#: ../../../paypal.php:270
 msgid "Archives"
 msgstr "Archives"
 
@@ -87,7 +98,7 @@ msgid "Sales"
 msgstr "Ventes"
 
 #: ../../../paypal.php:23
-#: ../../../paypal.php:282
+#: ../../../paypal.php:284
 msgid "Payment Details"
 msgstr "Détails du paiement"
 
@@ -325,36 +336,49 @@ msgid "Price"
 msgstr "Prix"
 
 #: ../../../paypal.php:183
-#: ../../../paypal.php:232
+#: ../../../paypal.php:234
 msgid "Treated"
 msgstr "Traité"
 
-#: ../../../paypal.php:233
-#: ../../../paypal.php:238
-#: ../../../paypal.php:244
-#: ../../../paypal.php:293
+#: ../../../paypal.php:183
+msgid "Del"
+msgstr "Supp"
+
+#: ../../../paypal.php:211
+msgid "Unsafe"
+msgstr "Incertain"
+
+#: ../../../paypal.php:235
+#: ../../../paypal.php:240
+#: ../../../paypal.php:246
+#: ../../../paypal.php:295
+#: ../../../paypal.php:304
 msgid "Error"
 msgstr "Erreur"
 
-#: ../../../paypal.php:237
+#: ../../../paypal.php:239
 msgid "Restored"
 msgstr "Restauré"
 
-#: ../../../paypal.php:243
+#: ../../../paypal.php:245
 msgid "Archived"
 msgstr "Archivé"
 
-#: ../../../paypal.php:274
+#: ../../../paypal.php:276
 msgid "Restore"
 msgstr "Restaurer"
 
-#: ../../../paypal.php:289
+#: ../../../paypal.php:291
 msgid "Are you sure ?"
 msgstr "Etes-vous certain ?"
 
-#: ../../../paypal.php:289
+#: ../../../paypal.php:291
 msgid "Archive"
 msgstr "Archiver"
+
+#: ../../../paypal.php:302
+msgid "Removed"
+msgstr "Supprimé"
 
 #: ../../../paypalMake.php:36
 msgid "Shipping cost"
@@ -363,3 +387,4 @@ msgstr "Frais de livraison"
 #: ../../../paypalMake.php:48
 msgid "Thank you for your payment"
 msgstr "Merci pour votre paiement"
+

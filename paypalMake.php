@@ -38,7 +38,7 @@ if(file_exists('data/paypal.json'))
 			$tmp .= "ip=document.createElement('input');ip.type='hidden';ip.name='quantity_'+(v+1);ip.value='1';fm.appendChild(ip);}";
 			$tmp .= "else{ip=document.createElement('input');ip.type='hidden';ip.name='shipping';ip.value='".$a1['tax']."';fm.appendChild(ip);}";
 			$tmp .= "ip=document.createElement('input');ip.type='hidden';ip.name='currency_code';ip.value='".$a1['curr']."';fm.appendChild(ip);";
-			$tmp .= "if(d!=0){ip=document.createElement('input');ip.type='hidden';ip.name='custom';ip.value='DIGITAL|'+d+'|'+r;fm.appendChild(ip);}"; // d : shortcode
+			$tmp .= "if(d!=0){ip=document.createElement('input');ip.type='hidden';ip.name='custom';ip.value='DIGITAL|'+d+'|'+r;fm.appendChild(ip);var x=new XMLHttpRequest(),p='action=paypaldigit&r='+r;x.open('POST','uno/plugins/paypal/paypalCall.php',true);x.setRequestHeader('Content-type','application/x-www-form-urlencoded');x.setRequestHeader('X-Requested-With','XMLHttpRequest');x.setRequestHeader('Content-length',p.length);x.setRequestHeader('Connection','close');x.send(p);}"; // d : shortcode
 			$tmp .= "else if(f.hasOwnProperty('name')&&f.hasOwnProperty('adre')){ip=document.createElement('input');ip.type='hidden';ip.name='custom';ip.value='ADRESS|'+f['name']+'|'+f['adre']+'|'+f['mail']+'|'+f['Ubusy'];fm.appendChild(ip);}"; // d : shortcode
 			$tmp .= "else{ip=document.createElement('input');ip.type='hidden';ip.name='lc';ip.value='".strtoupper($lang)."';fm.appendChild(ip);";
 			$tmp .= "ip=document.createElement('input');ip.type='hidden';ip.name='no_note';ip.value='1';fm.appendChild(ip);}";
