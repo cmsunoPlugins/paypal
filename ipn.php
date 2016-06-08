@@ -14,29 +14,19 @@ if($a && isset($_POST['txn_id']))
 	$urlPaypal = (($a['mod']=='test')?'https://www.sandbox.paypal.com':'https://www.paypal.com'); // test / prod
 	$req = 'cmd=_notify-validate'; // read the post from PayPal system and add 'cmd'
 	$kv = array("time" => time(), "treated" => 0, "mode" => $a['mod']);
-	$charset = 0;
-	if(isset($_POST['charset'])) $charset = ($_POST['charset']=='utf-8'?0:$_POST['charset']);
-	$get_magic_quotes_exists = (function_exists('get_magic_quotes_gpc')?true:false);
-	// Reading POSTed data directly from $_POST causes serialization issues with array data in the POST.
-	// Instead, read raw POST data from the input stream.
-	$post_data = file_get_contents('php://input');
-	$post_array = explode('&', $post_data);
-	$p = array();
-	foreach ($post_array as $r)
-		{
-		$r = explode('=',$r);
-		if(count($r)==2) $p[$r[0]] = urldecode($r[1]);
-		}
-	foreach($p as $k=>$v)
+	$charset = ((isset($_POST['charset'])&&$_POST['charset']!='utf-8')?$_POST['charset']:0);
+	foreach($_POST as $k=>$v)
 		{
 		$kv[$k] = ($charset?mb_convert_encoding($v,'utf-8',$charset):$v);
-		if($get_magic_quotes_exists && get_magic_quotes_gpc()==1) $v = urlencode(stripslashes($v));
-		else $v = urlencode($v);
+		$v = urlencode(stripslashes($v));
 		$req .= "&$k=$v";
 		}
+	//
 	// ipn handshake
-	$control = 2; $res = 0;
-	if(function_exists('curl_version'))
+	//
+	$res = 0; $door = ((isset($a['ssl'])&&$a['ssl'])?1:0);
+	// Solution 1 : CURL
+	if(!$door && function_exists('curl_version'))
 		{
 		$kv['IpnMethod'] = 'CURL controled';
 		$ch = curl_init($urlPaypal.'/cgi-bin/webscr');
@@ -50,14 +40,13 @@ if($a && isset($_POST['txn_id']))
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Connection: Close'));
 		$res = curl_exec($ch);
 		curl_close($ch);
-		if(!$res) $control = 1;
 		}
-	else if(function_exists('openssl_open'))
+	// Solution 2 : OPENSSL
+	else if(!$door && function_exists('openssl_open'))
 		{
 		$kv['IpnMethod'] = 'FSOCKOPEN controled';
 		$fp = fsockopen('ssl://'.$hostPaypal,443,$errno,$errstr,30);
-		if($fp===false) $control = 1;
-		else
+		if($fp!==false)
 			{
 			$header = "POST /cgi-bin/webscr HTTP/1.1\r\n";
 			$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
@@ -71,34 +60,38 @@ if($a && isset($_POST['txn_id']))
 				exit;
 				}
 			$res = stream_get_contents($fp);
-			$res = trim($res);
 			fclose($fp);
 			}
 		}
-	if($res)
+	if($res) // sol 1 & 2
 		{
-		// check Response
 		$res = trim($res);
 		$kv['IpnResponse'] = $res;
 		}
-	else if($control==1)
+	// Solution 3 : no handshake (not safe !)
+	if($res==0)
 		{
+		clearstatcache();
+		$door = 1;
 		$kv['IpnMethod'] = 'not controled';
 		// 1. check server data
 		$h = isset($_SERVER['HTTP_USER_AGENT'])?$_SERVER['HTTP_USER_AGENT']:0;
-		if(strpos($h,'PayPal IPN')===false && strpos($h,'paypal.com/ipn')===false || !$h) $control = 0;
+		if(strpos($h,'PayPal IPN')===false && strpos(stripslashes($h),'paypal.com/ipn')===false || !$h) $door = 0;
 		// 2. check file created when clic on Paypal button : paypalCall.php - only digital - <30 min
 		if(isset($_POST['custom']) && substr($_POST['custom'],0,8)=='DIGITAL|')
 			{
 			$dtmp = dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/tmp/';
 			$r = explode("|", $_POST['custom']); // [3] : key
-			if(isset($r[3]) && file_exists($dtmp.'digit'.$r[3].'.json') && filemtime($dtmp.'digit'.$r[3].'.json')>time()-1800) $kv['Ip_buyer'] = file_get_contents($dtmp.'digit'.$r[3].'.json');
-			else $control = 0;
+			if(isset($r[3]) && file_exists($dtmp.'digit'.$r[3].'.txt') && filemtime($dtmp.'digit'.$r[3].'.txt')>time()-1800) $kv['Ip_buyer'] = file_get_contents($dtmp.'digit'.$r[3].'.txt');
+			else $door = 0;
 			}
 		$kv['Server'] = str_replace(',',', ',json_encode($_SERVER));
 		}
+	//
+	// Control & Actions
+	//	
 	$ipn = json_encode($kv);
-	if($control==1 || strcmp($res,"VERIFIED")==0)
+	if($door || strcmp($res,"VERIFIED")==0)
 		{
 		if($_POST['payment_status']=="Completed")
 			{
@@ -221,10 +214,10 @@ if($a && isset($_POST['txn_id']))
 	else if(strcmp($res,"INVALID")==0)
 		{
 		file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/tmp/errorINVALID'.$_POST['txn_id'].'.json', $ipn);
-		sleep(2);exit;
 		}
 	else file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/tmp/errorResponse'.$_POST['txn_id'].'.json', $ipn);
 	}
+else if(isset($_POST['txn_id'])) file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/tmp/errorTopIpn'.$_POST['txn_id'].'.json', '');
 //
 function VerifIXNID($txn_id,$sdata)
 	{ // fonction pour verifier si la depense est deja effectue (1) ou pas (0)

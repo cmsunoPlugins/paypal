@@ -35,6 +35,11 @@ if (isset($_POST['action']))
 						<td><em><?php echo _("Email address or Paypal ID for the Paypal account. Select the ID helps prevent SPAM.");?></em></td>
 					</tr>
 					<tr>
+						<td><label><?php echo _("No IPN handshake");?></label></td>
+						<td><input type="checkbox" name="paySSL" id="paySSL" /></td>
+						<td><em><?php echo _("If your host is not SHA2, you probably need to check this unsafe option.");?></em></td>
+					</tr>
+					<tr>
 						<td><label><?php echo _("Currency");?></label></td>
 						<td>
 							<select name="payCurr" id="payCurr">
@@ -146,6 +151,7 @@ if (isset($_POST['action']))
 		if($q) $a = json_decode($q,true);
 		else $a = Array();
 		$a['mail'] = $_POST['mail'];
+		$a['ssl'] = ($_POST['ssl']?1:0);
 		$a['curr'] = $_POST['curr'];
 		$a['tax'] = ($_POST['tax']?$_POST['tax']:0);
 		$a['app'] = $_POST['app'];
