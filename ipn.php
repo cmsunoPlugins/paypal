@@ -241,7 +241,8 @@ function mailAdmin($tit, $msg, $bottom, $top, $url)
 	$header  = "From: ".$mailAdmin."<".$mailAdmin.">".$rn."Reply-To:".$mailAdmin."<".$mailAdmin.">MIME-Version: 1.0".$rn."Content-Type: multipart/alternative;".$rn." boundary=\"$boundary\"".$rn;
 	$msg= $rn."--".$boundary.$rn."Content-Type: text/plain; charset=\"utf-8\"".$rn."Content-Transfer-Encoding: 8bit".$rn.$rn.$msgT.$rn;
 	$msg.=$rn."--".$boundary.$rn."Content-Type: text/html; charset=\"utf-8\"".$rn."Content-Transfer-Encoding: 8bit".$rn.$rn.$msgH.$rn.$rn."--".$boundary."--".$rn.$rn."--".$boundary."--".$rn;
-	if(mail($mailAdmin, stripslashes($tit), stripslashes($msg), $header)) return true;
+	$subject = mb_encode_mimeheader(stripslashes($tit),"UTF-8");
+	if(mail($mailAdmin, $subject, stripslashes($msg), $header)) return true;
 	else return false;
 	}
 //
@@ -257,7 +258,8 @@ function mailUser($dest, $tit, $msg, $bottom, $top, $url=false)
 	$header  = "From: ".$mailAdmin."<".$mailAdmin.">".$rn."Reply-To:".$mailAdmin."<".$mailAdmin.">MIME-Version: 1.0".$rn."Content-Type: multipart/alternative;".$rn." boundary=\"$boundary\"".$rn;
 	$msg= $rn."--".$boundary.$rn."Content-Type: text/plain; charset=\"utf-8\"".$rn."Content-Transfer-Encoding: 8bit".$rn.$rn.$msgT.$rn;
 	$msg.=$rn."--".$boundary.$rn."Content-Type: text/html; charset=\"utf-8\"".$rn."Content-Transfer-Encoding: 8bit".$rn.$rn.$msgH.$rn.$rn."--".$boundary."--".$rn.$rn."--".$boundary."--".$rn;
-	if(mail($dest, stripslashes($tit), stripslashes($msg), $header)) return true;
+	$subject = mb_encode_mimeheader(stripslashes($tit),"UTF-8");
+	if(mail($dest, $subject, stripslashes($msg), $header)) return true;
 	else return false;
 	}
 //
