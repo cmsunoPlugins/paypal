@@ -32,6 +32,7 @@ Sales are checked and recorded with IPN return. Works also with digital goods.
 
 ### Versions ###
 
+* 1.1.3 - 07/08/2016 : Fix bug.
 * 1.1.2 - 24/06/2016 : Fix a display bug in the mail title.
 * 1.1.1 - 08/06/2016 : IPN optimization.
 * 1.1 - 02/04/2016 : Works with Paypal new safety rules even with a server not equipped with the right certificate.

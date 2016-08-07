@@ -189,7 +189,7 @@ if($a && isset($_POST['txn_id']))
 					if($mailAdmin)
 						{
 						$msg = "<table>";
-						foreach($kv as $k=>$v) $msg .= "<tr><td>".$k."&nbsp:&nbsp</td><td>".$v."</td></tr>\r\n";
+						foreach($kv as $k=>$v) if($v) $msg .= "<tr><td>".$k." : </td><td>".$v."</td></tr>\r\n";
 						$msg .= "</table>\r\n";
 						// MAIL ADMIN PAYMENT
 						mailAdmin('Paypal - '._('Payment receipt').' : '.$_POST['mc_gross'].$_POST['mc_currency'], $msg, $bottom, $top, $b2['url']);
