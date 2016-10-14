@@ -141,7 +141,7 @@ if($a && isset($_POST['txn_id']))
 								}
 							file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_digital/'.$d[3].$d[2].'.json', '{"t":"'.time().'","p":"paypal","d":"'.$d[2].'","k":"'.$d[3].'"}');
 							// link to zip in mail
-							$msg = $d[2].'.zip :<br />'."\r\n".'<a href="'.$b2['url'].'/files/upload/'.$d[3].$d[2].'.zip">'.$b2['url'].'/files/upload/'.$d[3].$d[2].'.zip</a>'."\r\n<br /><br />\r\n"._('Thank you for your trust, see you soon!')."\r\n";
+							$msg = $d[2].'.zip :<br />'."\r\n".'<a href="'.$b2['url'].'/files/upload/'.$d[3].$d[2].'.zip">'.$b2['url'].'/files/upload/'.$d[3].$d[2].'.zip</a>'."\r\n<br /><br />\r\n".T_('Thank you for your trust, see you soon!')."\r\n";
 							// MAIL USER LINK TO ZIP
 							mailUser($_POST['payer_email'], 'Download - '.$d[2], $msg, $bottom, $top);
 							}
@@ -164,19 +164,19 @@ if($a && isset($_POST['txn_id']))
 								}
 							if($mail && $Ubusy)
 								{
-								$msgOrder .= '</p><p>'._('Total').' : <strong>'.$p.' &euro;</strong></p>';
+								$msgOrder .= '</p><p>'.T_('Total').' : <strong>'.$p.' &euro;</strong></p>';
 								$msgOrder = str_replace(".",",",$msgOrder);
-								$msgOrder .= '<p>'._('Paid by Paypal').'.</p><hr /><p>'._('Name').' : '.$name.'<br />'._('Address').' : '.$adre.'<br />'._('Mail').' : '.$mail.'</p>';
+								$msgOrder .= '<p>'.T_('Paid by Paypal').'.</p><hr /><p>'.T_('Name').' : '.$name.'<br />'.T_('Address').' : '.$adre.'<br />'.T_('Mail').' : '.$mail.'</p>';
 								if($b3)
 									{
 									// MAIL ADMIN ORDER
-									mailAdmin(_('New order by Paypal'). ' - '.$_POST['txn_id'], $msgOrder, $bottom, $top, $b2['url']);
+									mailAdmin(T_('New order by Paypal'). ' - '.$_POST['txn_id'], $msgOrder, $bottom, $top, $b2['url']);
 									// MAIL USER ORDER
 									$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
 									$r = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, 'payment', $_POST['txn_id'].'|'.$mail, MCRYPT_MODE_ECB, $iv));
-									$info = "<a href='".stripslashes($b2['url']).'/uno/plugins/payment/paymentOrder.php?a=look&b='.urlencode($r)."&t=paypal'>"._("Follow the evolution of your order")."</a>";
-									$msgOrderU = $msgOrder.'<br /><p>'._('Thank you for your trust.').'</p><p>'.$info.'</p>';
-									mailUser($mail, $b2['tit'].' - '._('Order'), $msgOrderU, $bottom, $top, $b2['url'].'/'.$Ubusy.'.html');
+									$info = "<a href='".stripslashes($b2['url']).'/uno/plugins/payment/paymentOrder.php?a=look&b='.urlencode($r)."&t=paypal'>".T_("Follow the evolution of your order")."</a>";
+									$msgOrderU = $msgOrder.'<br /><p>'.T_('Thank you for your trust.').'</p><p>'.$info.'</p>';
+									mailUser($mail, $b2['tit'].' - '.T_('Order'), $msgOrderU, $bottom, $top, $b2['url'].'/'.$Ubusy.'.html');
 									}
 								}
 							// ADD MEMO TAX
@@ -192,7 +192,7 @@ if($a && isset($_POST['txn_id']))
 						foreach($kv as $k=>$v) if($v) $msg .= "<tr><td>".$k." : </td><td>".$v."</td></tr>\r\n";
 						$msg .= "</table>\r\n";
 						// MAIL ADMIN PAYMENT
-						mailAdmin('Paypal - '._('Payment receipt').' : '.$_POST['mc_gross'].$_POST['mc_currency'], $msg, $bottom, $top, $b2['url']);
+						mailAdmin('Paypal - '.T_('Payment receipt').' : '.$_POST['mc_gross'].$_POST['mc_currency'], $msg, $bottom, $top, $b2['url']);
 						}
 					file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['txn_id'].'.json', $ipn); // OK
 					}

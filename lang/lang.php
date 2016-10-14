@@ -7,9 +7,10 @@
 	//	
 	if(isset($langPlug[$lang]) && $langPlug[$lang])
 		{
-		putenv('LC_ALL='.$langPlug[$lang]);
-		setlocale(LC_ALL, $langPlug[$lang]);
-		bindtextdomain("paypal", dirname (__FILE__));
-		textdomain("paypal");
+		require_once(dirname(__FILE__).'/../../../includes/lang/php-gettext/gettext.inc');
+		T_setlocale(LC_MESSAGES, $langPlug[$lang]);
+		T_bindtextdomain("paypal", dirname(__FILE__));
+		T_bind_textdomain_codeset("paypal", "UTF-8");
+		T_textdomain("paypal");
 		}
 ?>

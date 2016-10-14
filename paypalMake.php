@@ -33,7 +33,7 @@ if(file_exists('data/paypal.json'))
 				$tmp .= "ip=document.createElement('input');ip.type='hidden';ip.name='item_number_'+(v+1);if(d!=0)ip.value='';else ip.value=f['prod'][v]['i']+'|'+f['prod'][v]['t'];fm.appendChild(ip);";
 				$tmp .= "ip=document.createElement('input');ip.type='hidden';ip.name='quantity_'+(v+1);ip.value=f['prod'][v]['q'];fm.appendChild(ip);";
 			$tmp .= "};if(f.hasOwnProperty('ship')&&f['ship']!=0){";
-			$tmp .= "ip=document.createElement('input');ip.type='hidden';ip.name='item_name_'+(v+1);ip.value='"._('Shipping cost')."';fm.appendChild(ip);";
+			$tmp .= "ip=document.createElement('input');ip.type='hidden';ip.name='item_name_'+(v+1);ip.value='".T_('Shipping cost')."';fm.appendChild(ip);";
 			$tmp .= "ip=document.createElement('input');ip.type='hidden';ip.name='amount_'+(v+1);ip.value=f['ship'];fm.appendChild(ip);";
 			$tmp .= "ip=document.createElement('input');ip.type='hidden';ip.name='quantity_'+(v+1);ip.value='1';fm.appendChild(ip);}";
 			$tmp .= "else{ip=document.createElement('input');ip.type='hidden';ip.name='shipping';ip.value='".$a1['tax']."';fm.appendChild(ip);}";
@@ -46,7 +46,7 @@ if(file_exists('data/paypal.json'))
 			$tmp .= "document.body.appendChild(fm);fm.submit();";
 		$tmp .= "}};</script>"."\r\n";
 		$Ufoot .= $tmp;
-		$Uonload .= "if('ok'==unoGvu('paypal')){unoPop('"._('Thank you for your payment')."',5000);document.cookie='cart=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';}";
+		$Uonload .= "if('ok'==unoGvu('paypal')){unoPop('".T_('Thank you for your payment')."',5000);document.cookie='cart=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';}";
 		$unoPop=1; // include unoPop.js in output
 		}
 	}
