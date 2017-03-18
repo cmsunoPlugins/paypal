@@ -4,9 +4,9 @@ if(!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQU
 <?php
 include(dirname(__FILE__).'/../../config.php');
 // ********************* actions *************************************************************************
-if (isset($_POST['action']))
+if(isset($_POST['action']))
 	{
-	switch ($_POST['action'])
+	switch($_POST['action'])
 		{
 		// ********************************************************************************************
 		case 'paypaldigit':

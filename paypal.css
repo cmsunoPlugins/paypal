@@ -6,3 +6,5 @@ table.paypalTO td:nth-child(2){color:#666;}
 .paypalListArchiv{float:left;width:24%;cursor:pointer;text-decoration:underline;}
 #paypalArchData{margin-bottom:10px;}
 #paypalArchiv{margin:15px 10px;}
+.curl{font-style:italic;color:green;}
+.nocurl{font-style:italic;color:brown;}

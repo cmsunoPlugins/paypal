@@ -5,8 +5,8 @@ if(!isset($_POST['unox']) || $_POST['unox']!=$_SESSION['unox']) {sleep(2);exit;}
 ?>
 <?php
 include('../../config.php');
-if (!is_dir('../../data/_sdata-'.$sdata.'/_paypal/')) mkdir('../../data/_sdata-'.$sdata.'/_paypal/',0711);
-if (!is_dir('../../data/_sdata-'.$sdata.'/_paypal/tmp/')) mkdir('../../data/_sdata-'.$sdata.'/_paypal/tmp/');
+if(!is_dir('../../data/_sdata-'.$sdata.'/_paypal/')) mkdir('../../data/_sdata-'.$sdata.'/_paypal/',0711);
+if(!is_dir('../../data/_sdata-'.$sdata.'/_paypal/tmp/')) mkdir('../../data/_sdata-'.$sdata.'/_paypal/tmp/');
 include('lang/lang.php');
 // ********************* actions *************************************************************************
 if (isset($_POST['action']))
@@ -35,9 +35,12 @@ if (isset($_POST['action']))
 						<td><em><?php echo T_("Email address or Paypal ID for the Paypal account. Select the ID helps prevent SPAM.");?></em></td>
 					</tr>
 					<tr>
-						<td><label><?php echo T_("No IPN handshake");?></label></td>
+						<td>
+							<label><?php echo T_("No IPN handshake");?></label>
+							<?php echo (function_exists('curl_version'))?'<div class="curl">'.T_("Curl available").'</div>':'<div class="nocurl">'.T_("Curl not available").'</div>'; ?>
+						</td>
 						<td><input type="checkbox" name="paySSL" id="paySSL" /></td>
-						<td><em><?php echo T_("If your host is not SHA2, you probably need to check this unsafe option.");?></em></td>
+						<td><em><?php echo T_("If your host is not SHA2 or if Curl is not available, you should check this unsafe option.");?></em></td>
 					</tr>
 					<tr>
 						<td><label><?php echo T_("Currency");?></label></td>
@@ -177,10 +180,10 @@ if (isset($_POST['action']))
 				#paypalVente table tr.PayTreatedYes td{color:green;}
 				#paypalVente table td.yesno{text-decoration:underline;cursor:pointer;}
 			</style>';
-		$tab=''; $d='../../data/_sdata-'.$sdata.'/_paypal/';
-		if ($dh=opendir($d))
+		$tab = array(); $d = '../../data/_sdata-'.$sdata.'/_paypal/';
+		if($dh=opendir($d))
 			{
-			while (($file = readdir($dh))!==false) { if ($file!='.' && $file!='..') $tab[]=$d.$file; }
+			while(($file = readdir($dh))!==false) { if ($file!='.' && $file!='..') $tab[]=$d.$file; }
 			closedir($dh);
 			}
 		if(count($tab))
@@ -190,9 +193,9 @@ if (isset($_POST['action']))
 			$b = array();
 			foreach($tab as $r)
 				{
-				$q=@file_get_contents($r);
-				$a=json_decode($q,true);
-				$b[]=$a;
+				$q = @file_get_contents($r);
+				$a = json_decode($q,true);
+				$b[] = $a;
 				}
 			function sortTime($u1,$u2) {return (isset($u2['time'])?$u2['time']:0) - (isset($u1['time'])?$u1['time']:0);}
 			usort($b, 'sortTime');
@@ -202,13 +205,13 @@ if (isset($_POST['action']))
 					{
 					$typ = '';
 					if(isset($r['custom']) && strpos($r['custom'],'DIGITAL|')!==false) $typ = '<br />(Digital)';
-					$item=((isset($r['item_number'])&&$r['item_number'])?$r['item_number'].' : ':'').((isset($r['item_name']) && isset($r['quantity']))?$r['item_name'].(($r['quantity']!="0")?' ('.$r['quantity'].')':''):'');
+					$item = ((isset($r['item_number'])&&$r['item_number'])?$r['item_number'].' : ':'').((isset($r['item_name']) && isset($r['quantity']))?$r['item_name'].(($r['quantity']!="0")?' ('.$r['quantity'].')':''):'');
 					if(!$item)
 						{
-						$v=1;
+						$v = 1;
 						while(isset($r['item_name'.$v]))
 							{
-							$item.=($item?'<br />':'').((isset($r['item_number'.$v])&&$r['item_number'.$v])?$r['item_number'.$v].' : ':'').$r['item_name'.$v].' ('.$r['quantity'.$v].')';
+							$item .= ($item?'<br />':'').((isset($r['item_number'.$v])&&$r['item_number'.$v])?$r['item_number'.$v].' : ':'').$r['item_name'.$v].' ('.$r['quantity'.$v].')';
 							++$v;
 							}
 						}
@@ -237,7 +240,7 @@ if (isset($_POST['action']))
 			$a['treated'] = 1;
 			}
 		$out = json_encode($a);
-		if (file_put_contents('../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['id'].'.json', $out)) echo T_('Treated');
+		if(file_put_contents('../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['id'].'.json', $out)) echo T_('Treated');
 		else echo '!'.T_('Error');
 		break;
 		// ********************************************************************************************
@@ -253,12 +256,13 @@ if (isset($_POST['action']))
 		break;
 		// ********************************************************************************************
 		case 'viewArchiv':
-		if (is_dir('../../data/_sdata-'.$sdata.'/_paypal/archive') && $h=opendir('../../data/_sdata-'.$sdata.'/_paypal/archive'))
+		if(is_dir('../../data/_sdata-'.$sdata.'/_paypal/archive') && $h=opendir('../../data/_sdata-'.$sdata.'/_paypal/archive'))
 			{
 			$o = '<div id="paypalArchData"></div><div>';
 			while(($d=readdir($h))!==false)
 				{
-				$ext=explode('.',$d); $ext=$ext[count($ext)-1];
+				$ext = explode('.',$d);
+				$ext = $ext[count($ext)-1];
 				if($d!='.' && $d!='..' && $ext=='json')
 					{
 					$o .= '<div class="paypalListArchiv" onClick="f_paypalViewA(\''.$d.'\');">'.$d.'</div>';
@@ -273,7 +277,8 @@ if (isset($_POST['action']))
 		if(isset($_POST['arch']) && file_exists('../../data/_sdata-'.$sdata.'/_paypal/archive/'.$_POST['arch']))
 			{
 			$q = @file_get_contents('../../data/_sdata-'.$sdata.'/_paypal/archive/'.$_POST['arch']);
-			$a = json_decode($q,true); $o = '<h3>'.T_('Archives').'</h3><table class="paypalTO">';
+			$a = json_decode($q,true);
+			$o = '<h3>'.T_('Archives').'</h3><table class="paypalTO">';
 			foreach($a as $k=>$v)
 				{
 				if($k=='time') $v .= ' => '.date("d/m/Y H:i",$v);
@@ -287,7 +292,8 @@ if (isset($_POST['action']))
 		if(isset($_POST['id']) && file_exists('../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['id'].'.json'))
 			{
 			$q = @file_get_contents('../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['id'].'.json');
-			$a = json_decode($q,true); $o = '<h3>'.T_('Payment Details').'</h3><table class="paypalTO">';
+			$a = json_decode($q,true);
+			$o = '<h3>'.T_('Payment Details').'</h3><table class="paypalTO">';
 			foreach($a as $k=>$v)
 				{
 				if($k=='time') $v .= ' => '.date("d/m/Y H:i",$v);

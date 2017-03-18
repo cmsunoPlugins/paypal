@@ -1,17 +1,10 @@
  <?php 
-// http://www.johnboy.com/blog/http-11-paypal-ipn-example-php-code
-// http://www.lafermeduweb.net/billet/tutorial-integrer-paypal-a-son-site-web-en-php-partie-2-276.html#ipn
-// https://developer.paypal.com/docs/classic/ipn/ht_ipn/
-// ex : 
-// mc_gross=19.95&protection_eligibility=Eligible&address_status=confirmed&payer_id=LPLWNMTBWMFAY&tax=0.00&address_street=1+Main+St&payment_date=20%3A12%3A59+Jan+13%2C+2009+PST&payment_status=Completed&charset=windows-1252&address_zip=95131&first_name=Test&mc_fee=0.88&address_country_code=US&address_name=Test+User&notify_version=2.6&custom=&payer_status=verified&address_country=United+States&address_city=San+Jose&quantity=1&verify_sign=AtkOfCXbDm2hu0ZELryHFjY-Vb7PAUvS6nMXgysbElEn9v-1XcmSoGtf&payer_email=gpmac_1231902590_per%40paypal.com&txn_id=61E67681CH3238416&payment_type=instant&last_name=User&address_state=CA&receiver_email=gpmac_1231902686_biz%40paypal.com&payment_fee=0.88&receiver_id=S8XGHLYDW9T3S&txn_type=express_checkout&item_name=&mc_currency=USD&item_number=&residence_country=US&test_ipn=1&handling_amount=0.00&transaction_subject=&payment_gross=19.95&shipping=0.00
-//
 include(dirname(__FILE__).'/../../config.php');
 $q = file_get_contents(dirname(__FILE__).'/../../data/paypal.json');
 $a = json_decode($q,true);
 if($a && isset($_POST['txn_id']))
 	{
-	$hostPaypal = (($a['mod']=='test')?'www.sandbox.paypal.com':'www.paypal.com'); // test / prod
-	$urlPaypal = (($a['mod']=='test')?'https://www.sandbox.paypal.com':'https://www.paypal.com'); // test / prod
+	$urlPaypal = (($a['mod']=='test')?'https://ipnpb.sandbox.paypal.com':'https://ipnpb.paypal.com'); // test / prod
 	$req = 'cmd=_notify-validate'; // read the post from PayPal system and add 'cmd'
 	$kv = array("time" => time(), "treated" => 0, "mode" => $a['mod']);
 	$charset = ((isset($_POST['charset'])&&$_POST['charset']!='utf-8')?$_POST['charset']:0);
@@ -22,10 +15,10 @@ if($a && isset($_POST['txn_id']))
 		$req .= "&$k=$v";
 		}
 	//
-	// ipn handshake
+	// IPN handshake
 	//
-	$res = 0; $door = ((isset($a['ssl'])&&$a['ssl'])?1:0);
-	// Solution 1 : CURL
+	$res = 0; $door = (!empty($a['ssl'])?1:0);
+	// Solution 1 : CURL  ( Solution 2 fsockopen removed )
 	if(!$door && function_exists('curl_version'))
 		{
 		$kv['IpnMethod'] = 'CURL controled';
@@ -41,43 +34,16 @@ if($a && isset($_POST['txn_id']))
 		$res = curl_exec($ch);
 		curl_close($ch);
 		}
-	// Solution 2 : OPENSSL
-	else if(!$door && function_exists('openssl_open'))
-		{
-		$kv['IpnMethod'] = 'FSOCKOPEN controled';
-		$fp = fsockopen('ssl://'.$hostPaypal,443,$errno,$errstr,30);
-		if($fp!==false)
-			{
-			$header = "POST /cgi-bin/webscr HTTP/1.1\r\n";
-			$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
-			$header .= "Content-Length: " . strlen($req) . "\r\n";
-			$header .= "Host: ".$hostPaypal."\r\n"; // sans http - sans /cgi-bin/webscr
-			$header .= "Connection: close\r\n\r\n";
-			$written = fwrite($fp,$header.$req);
-			if($written===false)
-				{
-				file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/tmp/errorNotWritten'.$_POST['txn_id'].'.json', json_encode($kv));
-				exit;
-				}
-			$res = stream_get_contents($fp);
-			fclose($fp);
-			}
-		}
-	if($res) // sol 1 & 2
-		{
-		$res = trim($res);
-		$kv['IpnResponse'] = $res;
-		}
-	// Solution 3 : no handshake (not safe !)
-	if($res==0)
+	if($res) $kv['IpnResponse'] = trim($res); // sol 1 & 2
+	else // Solution 3 : no handshake (not safe !)
 		{
 		clearstatcache();
 		$door = 1;
 		$kv['IpnMethod'] = 'not controled';
-		// 1. check server data
+		// 1. Check server data
 		$h = isset($_SERVER['HTTP_USER_AGENT'])?$_SERVER['HTTP_USER_AGENT']:0;
 		if(strpos($h,'PayPal IPN')===false && strpos(stripslashes($h),'paypal.com/ipn')===false || !$h) $door = 0;
-		// 2. check file created when clic on Paypal button : paypalCall.php - only digital - <30 min
+		// 2. Check file created when clic on Paypal button : paypalCall.php - only digital - <30 min
 		if(isset($_POST['custom']) && substr($_POST['custom'],0,8)=='DIGITAL|')
 			{
 			$dtmp = dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/tmp/';
@@ -95,9 +61,8 @@ if($a && isset($_POST['txn_id']))
 		{
 		if($_POST['payment_status']=="Completed")
 			{
-			// vérifier que txn_id n'a pas été précédemment traité
 			if(VerifIXNID($_POST['txn_id'],$sdata)==0)
-				{ // vérifier que receiver_email est votre adresse email PayPal principale
+				{
 				if($a['mail']==$_POST['receiver_email'] || $a['mail']==$_POST['receiver_id'])
 					{ // OK
 					include(dirname(__FILE__).'/lang/lang.php');
@@ -172,9 +137,9 @@ if($a && isset($_POST['txn_id']))
 									// MAIL ADMIN ORDER
 									mailAdmin(T_('New order by Paypal'). ' - '.$_POST['txn_id'], $msgOrder, $bottom, $top, $b2['url']);
 									// MAIL USER ORDER
-									$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-									$r = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, 'payment', $_POST['txn_id'].'|'.$mail, MCRYPT_MODE_ECB, $iv));
-									$info = "<a href='".stripslashes($b2['url']).'/uno/plugins/payment/paymentOrder.php?a=look&b='.urlencode($r)."&t=paypal'>".T_("Follow the evolution of your order")."</a>";
+									$iv = openssl_random_pseudo_bytes(16);
+									$r = base64_encode(openssl_encrypt($_POST['txn_id'].'|'.$mail, 'AES-256-CBC', substr($Ukey,0,32), OPENSSL_RAW_DATA, $iv));
+									$info = "<a href='".stripslashes($b2['url']).'/uno/plugins/payment/paymentOrder.php?a=look&b='.urlencode($r).'&i='.base64_encode($iv)."&t=paypal'>".T_("Follow the evolution of your order")."</a>";
 									$msgOrderU = $msgOrder.'<br /><p>'.T_('Thank you for your trust.').'</p><p>'.$info.'</p>';
 									mailUser($mail, $b2['tit'].' - '.T_('Order'), $msgOrderU, $bottom, $top, $b2['url'].'/'.$Ubusy.'.html');
 									}
@@ -197,17 +162,13 @@ if($a && isset($_POST['txn_id']))
 					file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['txn_id'].'.json', $ipn); // OK
 					}
 				else
-					{ // Mauvaise adresse email paypal
+					{ // Bad Paypal email address
 					file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/tmp/errorMailPaypal'.$_POST['txn_id'].'.json', $ipn);
 					}
 				}
-			else
-				{ // ID de transaction déjà utilisé
-				file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/tmp/errorRepetition'.$_POST['txn_id'].'.json', $ipn);
-				}
 			}
 		else
-			{ // Statut de paiement: Echec
+			{ // Status: Not Completed
 			file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/tmp/errorNotCompleted'.$_POST['txn_id'].'.json', $ipn);
 			}
 		}
@@ -217,14 +178,13 @@ if($a && isset($_POST['txn_id']))
 		}
 	else file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/tmp/errorResponse'.$_POST['txn_id'].'.json', $ipn);
 	}
-else if(isset($_POST['txn_id'])) file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/tmp/errorTopIpn'.$_POST['txn_id'].'.json', '');
 //
 function VerifIXNID($txn_id,$sdata)
-	{ // fonction pour verifier si la depense est deja effectue (1) ou pas (0)
-	$a=array();
-	if ($h=opendir(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/'))
+	{ // Already done ?
+	$a = array();
+	if($h=opendir(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/'))
 		{
-		while (($file=readdir($h))!==false) { if($file==$txn_id.'.json') {closedir($h); return 1;}}
+		while(($file=readdir($h))!==false) { if($file==$txn_id.'.json') {closedir($h); return 1;}}
 		closedir($h);
 		}
 	return 0;
@@ -233,36 +193,71 @@ function VerifIXNID($txn_id,$sdata)
 function mailAdmin($tit, $msg, $bottom, $top, $url)
 	{
 	global $mailAdmin;
-	$rn = "\r\n";
-	$boundary = "-----=".md5(rand());
-	$body = '<b><a href="'.$url.'/uno.php" style="color:#000000;">'.$tit.'</a></b><br />'.$rn.$msg.$rn;
+	$body = '<b><a href="'.$url.'/uno.php" style="color:#000000;">'.$tit.'</a></b><br />'."\r\n".$msg."\r\n";
 	$msgT = strip_tags($body);
 	$msgH = $top . $body . $bottom;
-	$header  = "From: ".$mailAdmin."<".$mailAdmin.">".$rn."Reply-To:".$mailAdmin."<".$mailAdmin.">MIME-Version: 1.0".$rn."Content-Type: multipart/alternative;".$rn." boundary=\"$boundary\"".$rn;
-	$msg= $rn."--".$boundary.$rn."Content-Type: text/plain; charset=\"utf-8\"".$rn."Content-Transfer-Encoding: 8bit".$rn.$rn.$msgT.$rn;
-	$msg.=$rn."--".$boundary.$rn."Content-Type: text/html; charset=\"utf-8\"".$rn."Content-Transfer-Encoding: 8bit".$rn.$rn.$msgH.$rn.$rn."--".$boundary."--".$rn.$rn."--".$boundary."--".$rn;
-	$subject = mb_encode_mimeheader(stripslashes($tit),"UTF-8");
-	if(mail($mailAdmin, $subject, stripslashes($msg), $header)) return true;
-	else return false;
+	if(file_exists(dirname(__FILE__).'/../newsletter/PHPMailer/PHPMailerAutoload.php'))
+		{
+		// PHPMailer
+		require_once(dirname(__FILE__).'/../newsletter/PHPMailer/PHPMailerAutoload.php');
+		$phm = new PHPMailer();
+		$phm->CharSet = "UTF-8";
+		$phm->setFrom($mailAdmin);
+		$phm->addReplyTo($mailAdmin);
+		$phm->AddAddress($mailAdmin);
+		$phm->isHTML(true);
+		$phm->Subject = stripslashes($tit);
+		$phm->Body = stripslashes($msgH);		
+		$phm->AltBody = stripslashes($msgT);
+		if($phm->Send()) return true;
+		else return false;
+		}
+	else
+		{
+		$rn = "\r\n";
+		$boundary = "-----=".md5(rand());
+		$header = "From: ".$mailAdmin."<".$mailAdmin.">".$rn."Reply-To:".$mailAdmin."<".$mailAdmin.">MIME-Version: 1.0".$rn."Content-Type: multipart/alternative;".$rn." boundary=\"$boundary\"".$rn;
+		$msg = $rn."--".$boundary.$rn."Content-Type: text/plain; charset=\"utf-8\"".$rn."Content-Transfer-Encoding: 8bit".$rn.$rn.$msgT.$rn;
+		$msg .= $rn."--".$boundary.$rn."Content-Type: text/html; charset=\"utf-8\"".$rn."Content-Transfer-Encoding: 8bit".$rn.$rn.$msgH.$rn.$rn."--".$boundary."--".$rn.$rn."--".$boundary."--".$rn;
+		$subject = mb_encode_mimeheader(stripslashes($tit),"UTF-8");
+		if(mail($mailAdmin, $subject, stripslashes($msg), $header)) return true;
+		else return false;
+		}
 	}
 //
 function mailUser($dest, $tit, $msg, $bottom, $top, $url=false)
 	{
 	global $mailAdmin;
-	$rn = "\r\n";
-	$boundary = "-----=".md5(rand());
-	if($url) $body = '<b><a href="'.$url.'.html" style="color:#000000;">'.$tit.'</a></b><br />'.$rn.$msg.$rn;
-	else $body = "<b>".$tit."</b><br />".$rn.$msg.$rn;
+	if($url) $body = '<b><a href="'.$url.'.html" style="color:#000000;">'.$tit.'</a></b><br />'."\r\n".$msg."\r\n";
+	else $body = "<b>".$tit."</b><br />\r\n".$msg."\r\n";
 	$msgT = strip_tags($body);
 	$msgH = $top . $body . $bottom;
-	$header  = "From: ".$mailAdmin."<".$mailAdmin.">".$rn."Reply-To:".$mailAdmin."<".$mailAdmin.">MIME-Version: 1.0".$rn."Content-Type: multipart/alternative;".$rn." boundary=\"$boundary\"".$rn;
-	$msg= $rn."--".$boundary.$rn."Content-Type: text/plain; charset=\"utf-8\"".$rn."Content-Transfer-Encoding: 8bit".$rn.$rn.$msgT.$rn;
-	$msg.=$rn."--".$boundary.$rn."Content-Type: text/html; charset=\"utf-8\"".$rn."Content-Transfer-Encoding: 8bit".$rn.$rn.$msgH.$rn.$rn."--".$boundary."--".$rn.$rn."--".$boundary."--".$rn;
-	$subject = mb_encode_mimeheader(stripslashes($tit),"UTF-8");
-	if(mail($dest, $subject, stripslashes($msg), $header)) return true;
-	else return false;
+	if(file_exists(dirname(__FILE__).'/../newsletter/PHPMailer/PHPMailerAutoload.php'))
+		{
+		// PHPMailer
+		require_once(dirname(__FILE__).'/../newsletter/PHPMailer/PHPMailerAutoload.php');
+		$phm = new PHPMailer();
+		$phm->CharSet = "UTF-8";
+		$phm->setFrom($mailAdmin);
+		$phm->addReplyTo($mailAdmin);
+		$phm->AddAddress($dest);
+		$phm->isHTML(true);
+		$phm->Subject = stripslashes($tit);
+		$phm->Body = stripslashes($msgH);		
+		$phm->AltBody = stripslashes($msgT);
+		if($phm->Send()) return true;
+		else return false;
+		}
+	else
+		{
+		$rn = "\r\n";
+		$boundary = "-----=".md5(rand());
+		$header = "From: ".$mailAdmin."<".$mailAdmin.">".$rn."Reply-To:".$mailAdmin."<".$mailAdmin.">MIME-Version: 1.0".$rn."Content-Type: multipart/alternative;".$rn." boundary=\"$boundary\"".$rn;
+		$msg = $rn."--".$boundary.$rn."Content-Type: text/plain; charset=\"utf-8\"".$rn."Content-Transfer-Encoding: 8bit".$rn.$rn.$msgT.$rn;
+		$msg .= $rn."--".$boundary.$rn."Content-Type: text/html; charset=\"utf-8\"".$rn."Content-Transfer-Encoding: 8bit".$rn.$rn.$msgH.$rn.$rn."--".$boundary."--".$rn.$rn."--".$boundary."--".$rn;
+		$subject = mb_encode_mimeheader(stripslashes($tit),"UTF-8");
+		if(mail($dest, $subject, stripslashes($msg), $header)) return true;
+		else return false;
+		}
 	}
-//
-//$er = error_get_last();
-//file_put_contents(dirname(__FILE__).'/../../data/errorIPNPaypal'.time().'.txt', $er);
 ?>
