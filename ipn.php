@@ -201,15 +201,15 @@ function mailAdmin($tit, $msg, $bottom, $top, $url)
 		// PHPMailer
 		require_once(dirname(__FILE__).'/../newsletter/PHPMailer/PHPMailerAutoload.php');
 		$phm = new PHPMailer();
-		$phm->CharSet = "UTF-8";
+		$phm->charSet = "UTF-8";
 		$phm->setFrom($mailAdmin);
 		$phm->addReplyTo($mailAdmin);
-		$phm->AddAddress($mailAdmin);
+		$phm->addAddress($mailAdmin);
 		$phm->isHTML(true);
-		$phm->Subject = stripslashes($tit);
-		$phm->Body = stripslashes($msgH);		
-		$phm->AltBody = stripslashes($msgT);
-		if($phm->Send()) return true;
+		$phm->subject = stripslashes($tit);
+		$phm->body = stripslashes($msgH);		
+		$phm->altBody = stripslashes($msgT);
+		if($phm->send()) return true;
 		else return false;
 		}
 	else
@@ -237,15 +237,15 @@ function mailUser($dest, $tit, $msg, $bottom, $top, $url=false)
 		// PHPMailer
 		require_once(dirname(__FILE__).'/../newsletter/PHPMailer/PHPMailerAutoload.php');
 		$phm = new PHPMailer();
-		$phm->CharSet = "UTF-8";
+		$phm->charSet = "UTF-8";
 		$phm->setFrom($mailAdmin);
 		$phm->addReplyTo($mailAdmin);
-		$phm->AddAddress($dest);
+		$phm->addAddress($dest);
 		$phm->isHTML(true);
-		$phm->Subject = stripslashes($tit);
-		$phm->Body = stripslashes($msgH);		
-		$phm->AltBody = stripslashes($msgT);
-		if($phm->Send()) return true;
+		$phm->subject = stripslashes($tit);
+		$phm->body = stripslashes($msgH);		
+		$phm->altBody = stripslashes($msgT);
+		if($phm->send()) return true;
 		else return false;
 		}
 	else

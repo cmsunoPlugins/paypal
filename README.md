@@ -32,6 +32,7 @@ Sales are checked and recorded with IPN return. Works also with digital goods.
 
 ### Versions ###
 
+* 1.2.3 - 01/04/2017 : Easier archive management
 * 1.2.2 - 18/03/2017 : Use PHPMailer if Newsletter plugin exists - Replace MCrypt by OpenSSL - Remove fsockopen method in IPN (only Curl)
 * 1.2.1 - 15/03/2017 : Fix issue when unknow lang
 * 1.2 - 14/10/2016 : Use PHP-Gettext in place of gettext

@@ -179,6 +179,7 @@ if (isset($_POST['action']))
 				#paypalVente table td{text-align:left;padding:2px 6px;vertical-align:middle;color:#0b4a6a;}
 				#paypalVente table tr.PayTreatedYes td{color:green;}
 				#paypalVente table td.yesno{text-decoration:underline;cursor:pointer;}
+				#paypalVente .paypalArchiv{width:16px;height:16px;margin:0 auto;background-position:-112px -96px;cursor:pointer;background-image:url("'.$_POST['udep'].'includes/img/ui-icons_444444_256x240.png")}
 			</style>';
 		$tab = array(); $d = '../../data/_sdata-'.$sdata.'/_paypal/';
 		if($dh=opendir($d))
@@ -189,7 +190,7 @@ if (isset($_POST['action']))
 		if(count($tab))
 			{
 			echo '<br /><table>';
-			echo '<tr><th>'.T_("Date").'</th><th>'.T_("Type").'</th><th>'.T_("Name").'</th><th>'.T_("Address").'</th><th>'.T_("Article").'</th><th>'.T_("Price").'</th><th>'.T_("Treated").'</th><th>'.T_("Del").'</th></tr>';
+			echo '<tr><th>'.T_("Date").'</th><th>'.T_("Type").'</th><th>'.T_("Name").'</th><th>'.T_("Address").'</th><th>'.T_("Article").'</th><th>'.T_("Price").'</th><th>'.T_("Treated").'</th><th>'.T_("Del").'</th><th>'.T_("Archive").'</th></tr>';
 			$b = array();
 			foreach($tab as $r)
 				{
@@ -225,6 +226,7 @@ if (isset($_POST['action']))
 					echo '<td '.(!$r['treated']?'onClick="f_treated_paypal(this,\''.$r['txn_id'].'\',\''.T_("Yes").'\')"':'').($r['treated']?'>'.T_("Yes"):' class="yesno">'.T_("No")).'</td>';
 					if(isset($r['test_ipn']) && $r['test_ipn']=='1' && isset($r['txn_id'])) echo '<td width="30px" style="cursor:pointer;background:transparent url(\''.$_POST['udep'].'includes/img/close.png\') no-repeat scroll center center;" onClick="f_supp_paypal(this,\''.$r['txn_id'].'\')">&nbsp;</td>';
 					else echo '<td></td>';
+					echo '<td><div class="paypalArchiv" onClick="f_archivOrderPaypal(\''.$r['txn_id'].'\',\''.T_("Are you sure ?").'\')"></div></td>';
 					echo '</tr>';
 					}
 				}
@@ -245,30 +247,67 @@ if (isset($_POST['action']))
 		break;
 		// ********************************************************************************************
 		case 'restaur':
-		if(file_exists('../../data/_sdata-'.$sdata.'/_paypal/archive/'.$_POST['f']) && rename('../../data/_sdata-'.$sdata.'/_paypal/archive/'.$_POST['f'],'../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['f'])) echo T_('Restored');
+		$d = $_POST['f'];
+		$a = explode('__',$d);
+		if(count($a)>2) $d1 = $a[0].'.json';
+		else $d1 = $d;
+		if(file_exists('../../data/_sdata-'.$sdata.'/_paypal/archive/'.$d) && rename('../../data/_sdata-'.$sdata.'/_paypal/archive/'.$d, '../../data/_sdata-'.$sdata.'/_paypal/'.$d1)) echo T_('Restored');
 		else echo '!'.T_('Error');
 		break;
 		// ********************************************************************************************
 		case 'archiv':
-		if(!is_dir('../../data/_sdata-'.$sdata.'/_paypal/archive')) mkdir('../../data/_sdata-'.$sdata.'/_paypal/archive',0711);
-		if(file_exists('../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['id'].'.json') && rename('../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['id'].'.json','../../data/_sdata-'.$sdata.'/_paypal/archive/'.$_POST['id'].'.json')) echo T_('Archived');
+		$p = '../../data/_sdata-'.$sdata.'/_paypal/archive';
+		if(!is_dir($p)) mkdir($p,0711);
+		$d = $_POST['id'].'.json';
+		$q = file_get_contents('../../data/_sdata-'.$sdata.'/_paypal/'.$d);
+		if($q) $a = json_decode($q,true);
+		else $a = array();
+		if(!empty($a['time']) && !empty($a['mc_gross']))
+			{
+			$d1 = substr($d,0,-5).'__'.$a['time'].'__'.str_replace('.','',$a['mc_gross']).'__.json';
+			}
+		else $d1 = $d;
+		if(file_exists('../../data/_sdata-'.$sdata.'/_paypal/'.$d) && rename('../../data/_sdata-'.$sdata.'/_paypal/'.$d, $p.'/'.$d1)) echo T_('Archived');
 		else echo '!'.T_('Error');
 		break;
 		// ********************************************************************************************
 		case 'viewArchiv':
-		if(is_dir('../../data/_sdata-'.$sdata.'/_paypal/archive') && $h=opendir('../../data/_sdata-'.$sdata.'/_paypal/archive'))
+		$p = '../../data/_sdata-'.$sdata.'/_paypal/archive';
+		if(is_dir($p) && $h=opendir($p))
 			{
-			$o = '<div id="paypalArchData"></div><div>';
+			$b = array();
 			while(($d=readdir($h))!==false)
 				{
 				$ext = explode('.',$d);
 				$ext = $ext[count($ext)-1];
 				if($d!='.' && $d!='..' && $ext=='json')
 					{
-					$o .= '<div class="paypalListArchiv" onClick="f_paypalViewA(\''.$d.'\');">'.$d.'</div>';
+					if(strpos($d,'__')!==false)
+						{
+						$a = explode('__',$d);
+						if(count($a)>2) $b[] = array('txn_id'=>$a[0], 'time'=>$a[1], 'mc_gross'=>$a[2], 'file'=>$d);
+						}
+					else
+						{
+						$q = file_get_contents($p.'/'.$d);
+						if($q) $a = json_decode($q,true);
+						else $a = array();
+						if(!empty($a['time']) && !empty($a['mc_gross']))
+							{
+							$d1 = substr($d,0,-5).'__'.$a['time'].'__'.str_replace('.','',$a['mc_gross']).'__.json';
+							rename($p.'/'.$d, $p.'/'.$d1);
+							}
+						}
+					
 					}
 				}
 			closedir($h);
+			usort($b, function($f,$g) { return $g['time'] - $f['time'];});
+			$o = '<div id="paypalArchData"></div><div>';
+			foreach($b as $r)
+				{
+				$o .= '<div class="paypalListArchiv" onClick="f_paypalViewA(\''.$r['file'].'\');">'.$r['txn_id'].' - '.date('dMy',$r['time']).' - '.substr($r['mc_gross'],0,-2).'&euro;</div>';
+				}
 			echo $o.'</div><div style="clear:left;"></div>';
 			}
 		break;
