@@ -14,7 +14,8 @@ function f_save_paypal(){
 		var act=document.getElementById("payAct").options[document.getElementById("payAct").selectedIndex].value;
 		var don=document.getElementById("payDon").options[document.getElementById("payDon").selectedIndex].value;
 		var ext=(document.getElementById('payExt').checked?1:0);
-		jQuery.post('uno/plugins/paypal/paypal.php',{'action':'save','unox':Unox,'mail':mail,'curr':curr,'tax':tax,'app':app,'mod':mod,'pop':pop,'act':act,'don':don,'ext':ext,'ssl':ssl},function(r){
+		var off=(document.getElementById('ckpaypaloff').checked?1:0);
+		jQuery.post('uno/plugins/paypal/paypal.php',{'action':'save','unox':Unox,'mail':mail,'curr':curr,'tax':tax,'app':app,'mod':mod,'pop':pop,'act':act,'don':don,'ext':ext,'ckpaypaloff':off,'ssl':ssl},function(r){
 			f_alert(r);
 		});
 	});
@@ -62,6 +63,7 @@ function f_load_paypal(){
 				for(v=0;v<to.length;v++){if(to[v].value==r.don){to[v].selected=true;v=to.length;}}
 			}
 			if(r.ext!=undefined&&r.ext)document.getElementById('payExt').checked=true;
+			if(r.ckpaypaloff!=undefined&&r.ckpaypaloff)document.getElementById('ckpaypaloff').checked=true;
 		});
 	});
 }

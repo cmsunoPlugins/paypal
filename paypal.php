@@ -110,6 +110,11 @@ if (isset($_POST['action']))
 				<h3><?php echo T_("Options :");?></h3>
 				<table class="hForm">
 					<tr>
+						<td><label><?php echo T_("No Paypal button");?></label></td>
+						<td><input type="checkbox" name="ckpaypaloff" id="ckpaypaloff" /></td>
+						<td><em><?php echo T_("You don't want to use the CKEditor Paypal Button.");?></em></td>
+					</tr>
+					<tr>
 						<td><label><?php echo T_("External use");?></label></td>
 						<td><input type="checkbox" name="payExt" id="payExt" /></td>
 						<td><em><?php echo T_("Use Paypal from another plugin : complete system with cart or digital product.");?></em></td>
@@ -166,6 +171,7 @@ if (isset($_POST['action']))
 		$a['home'] = substr($_SERVER['HTTP_REFERER'],0,-7).($home?$home:'index').'.html';
 		$a['lang5'] = (isset($langPlug[$lang])?substr($langPlug[$lang],0,5):'en_US');
 		$a['ext'] = ($_POST['ext']?1:0);
+		$a['ckpaypaloff'] = ($_POST['ckpaypaloff']?1:0);
 		$out = json_encode($a);
 		if (file_put_contents('../../data/paypal.json', $out)) echo T_('Backup performed');
 		else echo '!'.T_('Impossible backup');

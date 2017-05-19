@@ -2,6 +2,17 @@
 // CMSUno
 // Plugin Paypal
 //
+
+UconfigNum++;
+
+<?php $a = 0;
+if(file_exists(dirname(__FILE__).'/../../data/paypal.json'))
+	{
+	$q = file_get_contents(dirname(__FILE__).'/../../data/paypal.json');
+	$a = json_decode($q,true);
+	}
+if(empty($a['ckpaypaloff'])) { ?>
+
 var paypalMail='',paypalCurr='',paypalTax='';
 jQuery(document).ready(function(){
 	jQuery.getJSON("uno/data/paypal.json?r="+Math.random(),function(r){
@@ -18,9 +29,6 @@ jQuery(document).ready(function(){
 		paypalSand=0; // SANDBOX en global lors du Make
 	});
 });
-
-UconfigNum++;
-
 CKEDITOR.plugins.addExternal('ckpaypal',UconfigFile[UconfigNum-1]+'/../ckpaypal/');
 CKEDITOR.editorConfig = function(config){
 	config.extraPlugins += ',ckpaypal';
@@ -28,3 +36,11 @@ CKEDITOR.editorConfig = function(config){
 	config.extraAllowedContent += '; input[*](ckpaypal)';
 	if(UconfigFile.length>UconfigNum)config.customConfig=UconfigFile[UconfigNum];
 };
+
+<?php } else { ?>
+
+CKEDITOR.editorConfig = function(config){
+	if(UconfigFile.length>UconfigNum)config.customConfig=UconfigFile[UconfigNum];
+};
+
+<?php } ?>
