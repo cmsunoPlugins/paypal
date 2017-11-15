@@ -22,7 +22,7 @@ jQuery(document).ready(function(){
 		if(r.curr!=undefined)paypalCurr=r.curr;else paypalCurr=0;
 		if(r.tax!=undefined)paypalTax=r.tax;else paypalTax=0;
 		if(r.app!=undefined)paypalApp=r.app;
-		if(r.act!=undefined)paypalAct=r.act;
+		if(r.sel!=undefined)paypalAct=r.sel;
 		if(r.don!=undefined)paypalDonval=r.don;
 		if(r.lang5!=undefined)paypalLang5=r.lang5;else paypalLang5='en_US';
 		paypalTaxIncl=0; // non utilise

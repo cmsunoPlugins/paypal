@@ -4,6 +4,7 @@
 //
 function f_save_paypal(){
 	jQuery(document).ready(function(){
+		var act=document.getElementById('activ').checked?1:0;
 		var mail=document.getElementById("payMail").value;
 		var ssl=(document.getElementById('paySSL').checked?1:0);
 		var curr=document.getElementById("payCurr").options[document.getElementById("payCurr").selectedIndex].value;
@@ -11,11 +12,10 @@ function f_save_paypal(){
 		var app=document.getElementById("payApp").options[document.getElementById("payApp").selectedIndex].value;
 		var mod=document.getElementById("payMod").options[document.getElementById("payMod").selectedIndex].value;
 		var pop=document.getElementById("payPop").options[document.getElementById("payPop").selectedIndex].value;
-		var act=document.getElementById("payAct").options[document.getElementById("payAct").selectedIndex].value;
+		var sel=document.getElementById("paySel").options[document.getElementById("paySel").selectedIndex].value;
 		var don=document.getElementById("payDon").options[document.getElementById("payDon").selectedIndex].value;
-		var ext=(document.getElementById('payExt').checked?1:0);
 		var off=(document.getElementById('ckpaypaloff').checked?1:0);
-		jQuery.post('uno/plugins/paypal/paypal.php',{'action':'save','unox':Unox,'mail':mail,'curr':curr,'tax':tax,'app':app,'mod':mod,'pop':pop,'act':act,'don':don,'ext':ext,'ckpaypaloff':off,'ssl':ssl},function(r){
+		jQuery.post('uno/plugins/paypal/paypal.php',{'action':'save','unox':Unox,'sel':sel,'mail':mail,'curr':curr,'tax':tax,'app':app,'mod':mod,'pop':pop,'act':act,'don':don,'ckpaypaloff':off,'ssl':ssl},function(r){
 			f_alert(r);
 		});
 	});
@@ -23,6 +23,7 @@ function f_save_paypal(){
 function f_load_paypal(){
 	jQuery(document).ready(function(){
 		jQuery.getJSON("uno/data/paypal.json?r="+Math.random(),function(r){
+			if(r.act!=undefined&&r.act==1)document.getElementById('activ').checked=true;else document.getElementById('activ').checked=false;
 			if(r.mail!=undefined)document.getElementById('payMail').value=r.mail;
 			if(r.ssl!=undefined&&r.ssl)document.getElementById('paySSL').checked=true;
 			if(r.curr){
@@ -52,17 +53,16 @@ function f_load_paypal(){
 				to=t.options;
 				for(v=0;v<to.length;v++){if(to[v].value==r.pop){to[v].selected=true;v=to.length;}}
 			}
-			if(r.act){
-				t=document.getElementById("payAct");
+			if(r.sel){
+				t=document.getElementById("paySel");
 				to=t.options;
-				for(v=0;v<to.length;v++){if(to[v].value==r.act){to[v].selected=true;v=to.length;}}
+				for(v=0;v<to.length;v++){if(to[v].value==r.sel){to[v].selected=true;v=to.length;}}
 			}
 			if(r.don!=undefined){
 				t=document.getElementById("payDon");
 				to=t.options;
 				for(v=0;v<to.length;v++){if(to[v].value==r.don){to[v].selected=true;v=to.length;}}
 			}
-			if(r.ext!=undefined&&r.ext)document.getElementById('payExt').checked=true;
 			if(r.ckpaypaloff!=undefined&&r.ckpaypaloff)document.getElementById('ckpaypaloff').checked=true;
 		});
 	});

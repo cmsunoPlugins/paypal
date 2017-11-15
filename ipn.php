@@ -1,9 +1,18 @@
- <?php 
+<?php 
 include(dirname(__FILE__).'/../../config.php');
+if(file_exists(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/ssite.json'))
+	{
+	$q = file_get_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/ssite.json'); $b = json_decode($q,true);
+	$mailAdmin = $b['mel'];
+	}
+else $mailAdmin = false;
+include(dirname(__FILE__).'/../../template/mailTemplate.php');
+$bottom = str_replace('[[unsubscribe]]','&nbsp;',$bottom);
 $q = file_get_contents(dirname(__FILE__).'/../../data/paypal.json');
 $a = json_decode($q,true);
 if($a && isset($_POST['txn_id']))
 	{
+	include(dirname(__FILE__).'/lang/lang.php');
 	$urlPaypal = (($a['mod']=='test')?'https://ipnpb.sandbox.paypal.com':'https://ipnpb.paypal.com'); // test / prod
 	$req = 'cmd=_notify-validate'; // read the post from PayPal system and add 'cmd'
 	$kv = array("time" => time(), "treated" => 0, "mode" => $a['mod']);
@@ -65,17 +74,6 @@ if($a && isset($_POST['txn_id']))
 				{
 				if($a['mail']==$_POST['receiver_email'] || $a['mail']==$_POST['receiver_id'])
 					{ // OK
-					include(dirname(__FILE__).'/lang/lang.php');
-					if(file_exists(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/ssite.json'))
-						{
-						$q = file_get_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/ssite.json'); $b = json_decode($q,true);
-						$mailAdmin = $b['mel'];
-						}
-					else $mailAdmin = false;
-					include dirname(__FILE__).'/../../template/mailTemplate.php';
-					$bottom = str_replace('[[unsubscribe]]','&nbsp;',$bottom);
-					$q = file_get_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/ssite.json'); $b = json_decode($q,true);
-					// DIGITAL ?
 					if(substr($_POST['custom'],0,8)=='DIGITAL|')
 						{
 						$q = file_get_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/markdown.json'); $b1 = json_decode($q,true);
@@ -112,12 +110,15 @@ if($a && isset($_POST['txn_id']))
 							}
 						}
 					// ORDER ?
-					if(isset($_POST['item_name1']) && isset($_POST['custom']))
+					if(!empty($_POST['item_name1']) && isset($_POST['custom']))
 						{
-						if($n=strpos($_POST['custom'],'ADRESS|')!==false)
+						if($n = strpos($_POST['custom'],'ADRESS|')!==false)
 							{
 							$v = explode("|", substr($_POST['custom'],$n));
-							$name =  str_replace("\\","",$v[1]); $adre = str_replace("\\","",$v[2]); $mail = $v[3]; $Ubusy = $v[4];
+							$name =  str_replace("\\","",$v[1]);
+							$adre = str_replace("\\","",$v[2]);
+							$mail = $v[3];
+							$Ubusy = $v[4];
 							$q = file_get_contents(dirname(__FILE__).'/../../data/'.$Ubusy.'/site.json'); $b2 = json_decode($q,true);
 							$msgOrder = '<p style="text-align:right;">'.date("d/m/Y H:i").'</p><p>'; $b3 = 0; $p = 0; $name = ''; $n = 1;
 							while(isset($_POST['item_name'.$n]))
@@ -154,7 +155,7 @@ if($a && isset($_POST['txn_id']))
 					if($mailAdmin)
 						{
 						$msg = "<table>";
-						foreach($kv as $k=>$v) if($v) $msg .= "<tr><td>".$k." : </td><td>".$v."</td></tr>\r\n";
+						foreach($kv as $k=>$v) if(!empty($v)) $msg .= "<tr><td>".$k." : </td><td>".$v."</td></tr>\r\n";
 						$msg .= "</table>\r\n";
 						// MAIL ADMIN PAYMENT
 						mailAdmin('Paypal - '.T_('Payment receipt').' : '.$_POST['mc_gross'].$_POST['mc_currency'], $msg, $bottom, $top, $b2['url']);
@@ -201,14 +202,14 @@ function mailAdmin($tit, $msg, $bottom, $top, $url)
 		// PHPMailer
 		require_once(dirname(__FILE__).'/../newsletter/PHPMailer/PHPMailerAutoload.php');
 		$phm = new PHPMailer();
-		$phm->charSet = "UTF-8";
+		$phm->CharSet = 'UTF-8';
 		$phm->setFrom($mailAdmin);
 		$phm->addReplyTo($mailAdmin);
 		$phm->addAddress($mailAdmin);
 		$phm->isHTML(true);
-		$phm->subject = stripslashes($tit);
-		$phm->body = stripslashes($msgH);		
-		$phm->altBody = stripslashes($msgT);
+		$phm->Subject = stripslashes($tit);
+		$phm->Body = stripslashes($msgH);		
+		$phm->AltBody = stripslashes($msgT);
 		if($phm->send()) return true;
 		else return false;
 		}
@@ -237,14 +238,14 @@ function mailUser($dest, $tit, $msg, $bottom, $top, $url=false)
 		// PHPMailer
 		require_once(dirname(__FILE__).'/../newsletter/PHPMailer/PHPMailerAutoload.php');
 		$phm = new PHPMailer();
-		$phm->charSet = "UTF-8";
+		$phm->CharSet = 'UTF-8';
 		$phm->setFrom($mailAdmin);
 		$phm->addReplyTo($mailAdmin);
 		$phm->addAddress($dest);
 		$phm->isHTML(true);
-		$phm->subject = stripslashes($tit);
-		$phm->body = stripslashes($msgH);		
-		$phm->altBody = stripslashes($msgT);
+		$phm->Subject = stripslashes($tit);
+		$phm->Body = stripslashes($msgH);		
+		$phm->AltBody = stripslashes($msgT);
 		if($phm->send()) return true;
 		else return false;
 		}

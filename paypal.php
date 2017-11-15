@@ -23,12 +23,17 @@ if (isset($_POST['action']))
 			<div id="paypalD" class="bouton fr current" title="<?php echo T_("Payment Details");?>" style="display:none;"><?php echo T_("Payment Details");?></div>
 			<h2><?php echo T_("Paypal");?></h2>
 			<div id="paypalConfig" style="display:none;">
-				<img style="float:right;margin:10px;" src="uno/plugins/paypal/images/paypalLogo.png" />
+				<img style="float:right;margin:10px;" src="uno/plugins/paypal/img/paypalLogo.png" />
 				<p><?php echo T_("This plugin allows you to add different Paypal buttons in your website.");?></p>
 				<p><?php echo T_("It is used with the button") .'<img src="uno/plugins/paypal/ckpaypal/icons/ckpaypal.png" style="border:1px solid #aaa;padding:3px;margin:0 6px -5px;border-radius:2px;" />' . T_("added to the text editor when the plugin is enabled.");?></p>
 				<p><?php echo T_("Create your account on");?>&nbsp;<a href='https://www.paypal.com/'>Paypal</a>.</p>
 				<h3><?php echo T_("Default Settings :");?></h3>
 				<table class="hForm">
+					<tr>
+						<td><label><?php echo T_("Activate");?></label></td>
+						<td><input type="checkbox" class="input" name="activ" id="activ" /></td>
+						<td><em><?php echo T_("Enable the payment with Paypal");?></em></td>
+					</tr>
 					<tr>
 						<td><label><?php echo T_("Email or Paypal ID");?></label></td>
 						<td><input type="text" class="input" name="payMail" id="payMail" style="width:150px;" /></td>
@@ -75,15 +80,15 @@ if (isset($_POST['action']))
 							</select>
 						</td>
 						<td>
-							<img id="payCC_LG" src="uno/plugins/paypal/images/btnCC_LG.gif" alt="<?php echo T_("Standard with flags");?>" />
-							<img id="pay_LG" style="display:none;" src="uno/plugins/paypal/images/btn_LG.gif" alt="<?php echo T_("Standard with flags");?>" />
-							<img id="pay_SM" style="display:none;" src="uno/plugins/paypal/images/btn_SM.gif" alt="<?php echo T_("Standard with flags");?>" />
+							<img id="payCC_LG" src="uno/plugins/paypal/img/btnCC_LG.gif" alt="<?php echo T_("Standard with flags");?>" />
+							<img id="pay_LG" style="display:none;" src="uno/plugins/paypal/img/btn_LG.gif" alt="<?php echo T_("Standard with flags");?>" />
+							<img id="pay_SM" style="display:none;" src="uno/plugins/paypal/img/btn_SM.gif" alt="<?php echo T_("Standard with flags");?>" />
 						</td>
 					</tr>
 					<tr>
 						<td><label><?php echo T_("Selling");?></label></td>
 						<td>
-							<select name="payAct" id="payAct">
+							<select name="paySel" id="paySel">
 								<option value="products"><?php echo T_("products");?></option>
 								<option value="services"><?php echo T_("services");?></option>
 							</select>
@@ -113,11 +118,6 @@ if (isset($_POST['action']))
 						<td><label><?php echo T_("No Paypal button");?></label></td>
 						<td><input type="checkbox" name="ckpaypaloff" id="ckpaypaloff" /></td>
 						<td><em><?php echo T_("You don't want to use the CKEditor Paypal Button.");?></em></td>
-					</tr>
-					<tr>
-						<td><label><?php echo T_("External use");?></label></td>
-						<td><input type="checkbox" name="payExt" id="payExt" /></td>
-						<td><em><?php echo T_("Use Paypal from another plugin : complete system with cart or digital product.");?></em></td>
 					</tr>
 				</table>
 				<br />
@@ -158,6 +158,14 @@ if (isset($_POST['action']))
 		$q = @file_get_contents('../../data/paypal.json');
 		if($q) $a = json_decode($q,true);
 		else $a = Array();
+		$a['act'] = $_POST['act'];
+		if(file_exists('../../data/payment.json'))
+			{
+			$q = file_get_contents('../../data/payment.json'); $b = json_decode($q,true);
+			if(empty($b['method'])) $b['method'] = array();
+			$b['method']['paypal'] = $_POST['act'];
+			file_put_contents('../../data/payment.json',json_encode($b));
+			}
 		$a['mail'] = $_POST['mail'];
 		$a['ssl'] = ($_POST['ssl']?1:0);
 		$a['curr'] = $_POST['curr'];
@@ -165,12 +173,11 @@ if (isset($_POST['action']))
 		$a['app'] = $_POST['app'];
 		$a['mod'] = $_POST['mod'];
 		$a['pop'] = $_POST['pop'];
-		$a['act'] = $_POST['act'];
+		$a['sel'] = $_POST['sel'];
 		$a['don'] = ($_POST['don']?$_POST['don']:0);
 		$a['url'] = substr($_SERVER['HTTP_REFERER'],0,-4).'/plugins/paypal/ipn.php';
 		$a['home'] = substr($_SERVER['HTTP_REFERER'],0,-7).($home?$home:'index').'.html';
 		$a['lang5'] = (isset($langPlug[$lang])?substr($langPlug[$lang],0,5):'en_US');
-		$a['ext'] = ($_POST['ext']?1:0);
 		$a['ckpaypaloff'] = ($_POST['ckpaypaloff']?1:0);
 		$out = json_encode($a);
 		if (file_put_contents('../../data/paypal.json', $out)) echo T_('Backup performed');

@@ -14,6 +14,7 @@ if(file_exists('data/paypal.json'))
 	if($a1['pop']=='1') $Ucontent = str_replace("appendChild(fm);fm.submit();","appendChild(fm);window.open('','paypop','width=960,height=600,resizeable,scrollbars');fm.target='paypop';fm.submit();",$Ucontent); // Paypal dans un popup
 	else $Ucontent = str_replace("appendChild(fm);window.open('','paypop','width=960,height=600,resizeable,scrollbars');fm.target='paypop';fm.submit();","appendChild(fm);fm.submit();",$Ucontent);
 	if($a1['ext'] && (strpos($Ucontent,'paypalCart(')!==false || strpos($Uhtml,'paypalCart(')!==false || strpos($Ufoot,'paypalCart(')!==false)) // paymentMake executed before paypalMake
+	if(!empty($a1['act']))
 		{
 		// JSON : {"prod":{"0":{"n":"clef de 12","p":8.5,"i":"","q":1,"t":1},"1":{"n":"tournevis","p":1.5,"i":"","q":2,"t":1},"2":{"n":"papier craft","p":0.21,"i":"","q":30,"t":1}},"digital":"Ubusy|readme","ship":"4","name":"Sting","adre":"rue du lac 33234 PLOUG","mail":"bob@example.com"}
 		// n=nom, p=prix, i=ID, q=quantite, t=taxe id (1+2+4+8)
