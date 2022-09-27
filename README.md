@@ -32,6 +32,7 @@ Sales are checked and recorded with IPN return. Works also with digital goods.
 
 ### Versions ###
 
+* 1.3.1 - 27/09/2022 : Responsive display.
 * 1.3 - 15/11/2017 : Payment plugin Update
 * 1.2.4 - 19/05/2017 : Option to hide the CKEditor Paypal Button
 * 1.2.3 - 01/04/2017 : Easier archive management

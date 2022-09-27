@@ -8,3 +8,8 @@ table.paypalTO td:nth-child(2){color:#666;}
 #paypalArchiv{margin:15px 10px;}
 .curl{font-style:italic;color:green;}
 .nocurl{font-style:italic;color:brown;}
+#paypalDetail td:nth-child(2){word-break:break-word;}
+@media screen and (max-width:780px){
+	#paypalVente tr{display:block;margin-bottom:10px;}
+	#paypalVente td:nth-child(3),#paypalVente th:nth-child(3),#paypalVente td:nth-child(5),#paypalVente th:nth-child(5){display:block;text-align:left;}
+}
