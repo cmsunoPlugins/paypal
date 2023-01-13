@@ -112,7 +112,7 @@ if(isset($_POST['action'])) {
 			if($b) file_put_contents('../../data/payment.json',json_encode($b));
 		}
 		$a['mail'] = strip_tags($_POST['mail']);
-		$a['ssl'] = ($_POST['ssl']?1:0);
+		$a['ssl'] = (!empty($_POST['ssl'])?1:0);
 		$a['curr'] = $_POST['curr'];
 		$a['mod'] = strip_tags($_POST['mod']);
 		$a['url'] = substr($_SERVER['HTTP_REFERER'],0,-4).'/plugins/paypal/ipn.php';
