@@ -1,23 +1,19 @@
 <?php
-if (!isset($_SESSION['cmsuno'])) exit();
+if(!isset($_SESSION['cmsuno'])) exit();
 ?>
 <?php
-if(file_exists('data/paypal.json'))
-	{
-	include('plugins/paypal/lang/lang.php');
+if(file_exists('data/paypal.json')) {
+	$lang0 = $lang;
 	$q1 = file_get_contents('data/paypal.json');
 	$a1 = json_decode($q1,true);
-	$prod = 'https://www.paypal.com/';
-	$sand = 'https://www.sandbox.paypal.com/';
-	if($a1['mod']=='test') $Ucontent = str_replace($prod,$sand,$Ucontent); // mode SANDBOX
-	else if($a1['mod']=='prod') $Ucontent = str_replace($sand,$prod,$Ucontent); // mode PRODUCTION
-	if($a1['pop']=='1') $Ucontent = str_replace("appendChild(fm);fm.submit();","appendChild(fm);window.open('','paypop','width=960,height=600,resizeable,scrollbars');fm.target='paypop';fm.submit();",$Ucontent); // Paypal dans un popup
-	else $Ucontent = str_replace("appendChild(fm);window.open('','paypop','width=960,height=600,resizeable,scrollbars');fm.target='paypop';fm.submit();","appendChild(fm);fm.submit();",$Ucontent);
-	if($a1['ext'] && (strpos($Ucontent,'paypalCart(')!==false || strpos($Uhtml,'paypalCart(')!==false || strpos($Ufoot,'paypalCart(')!==false)) // paymentMake executed before paypalMake
-	if(!empty($a1['act']))
-		{
+	if(!empty($a1['lng'])) $lang = $a1['lng'];
+	include('plugins/paypal/lang/lang.php');
+	//
+	if(!empty($a1['mail']) && !empty($a1['url']) && !empty($a1['home']) && !empty($a1['curr'])) {
 		// JSON : {"prod":{"0":{"n":"clef de 12","p":8.5,"i":"","q":1,"t":1},"1":{"n":"tournevis","p":1.5,"i":"","q":2,"t":1},"2":{"n":"papier craft","p":0.21,"i":"","q":30,"t":1}},"digital":"Ubusy|readme","ship":"4","name":"Sting","adre":"rue du lac 33234 PLOUG","mail":"bob@example.com"}
 		// n=nom, p=prix, i=ID, q=quantite, t=taxe id (1+2+4+8)
+		//
+		// paypalCart() Called from paymentMake.php :
 		$tmp = "<script type=\"text/javascript\">";
 		$tmp .= "function paypalCart(f){var d=0,r=0,dg=0;f=JSON.parse(f);if(f['prod']){";
 			$tmp .= "Object.size=function(o){var s=0,k;for(k in o){if(o.hasOwnProperty(k))s++;}return s;};";
@@ -37,7 +33,6 @@ if(file_exists('data/paypal.json'))
 			$tmp .= "ip=document.createElement('input');ip.type='hidden';ip.name='item_name_'+(v+1);ip.value='".T_('Shipping cost')."';fm.appendChild(ip);";
 			$tmp .= "ip=document.createElement('input');ip.type='hidden';ip.name='amount_'+(v+1);ip.value=f['ship'];fm.appendChild(ip);";
 			$tmp .= "ip=document.createElement('input');ip.type='hidden';ip.name='quantity_'+(v+1);ip.value='1';fm.appendChild(ip);}";
-			$tmp .= "else{ip=document.createElement('input');ip.type='hidden';ip.name='shipping';ip.value='".$a1['tax']."';fm.appendChild(ip);}";
 			$tmp .= "ip=document.createElement('input');ip.type='hidden';ip.name='currency_code';ip.value='".$a1['curr']."';fm.appendChild(ip);";
 			$tmp .= "if(d!=0){ip=document.createElement('input');ip.type='hidden';ip.name='custom';ip.value='DIGITAL|'+d+'|'+r;fm.appendChild(ip);";
 			$tmp .= "var x=new XMLHttpRequest(),p='action=paypaldigit&r='+r;x.open('POST','uno/plugins/paypal/paypalCall.php',true);x.setRequestHeader('Content-type','application/x-www-form-urlencoded');x.setRequestHeader('X-Requested-With','XMLHttpRequest');x.setRequestHeader('Content-length',p.length);x.setRequestHeader('Connection','close');x.send(p);"; // d : shortcode
@@ -49,6 +44,7 @@ if(file_exists('data/paypal.json'))
 		$Ufoot .= $tmp;
 		$Uonload .= "if('ok'==unoGvu('paypal')){unoPop('".T_('Thank you for your payment')."',5000);document.cookie='cart=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';}";
 		$unoPop = 1; // include unoPop.js in output
-		}
 	}
+	$lang = $lang0;
+}
 ?>

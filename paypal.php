@@ -1,18 +1,16 @@
 <?php
 session_start(); 
-if(!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])!='xmlhttprequest') {sleep(2);exit;} // ajax request
 if(!isset($_POST['unox']) || $_POST['unox']!=$_SESSION['unox']) {sleep(2);exit;} // appel depuis uno.php
 ?>
 <?php
 include('../../config.php');
+include('lang/lang.php');
+$busy = (isset($_POST['ubusy'])?preg_replace("/[^A-Za-z0-9-_]/",'',$_POST['ubusy']):'index');
 if(!is_dir('../../data/_sdata-'.$sdata.'/_paypal/')) mkdir('../../data/_sdata-'.$sdata.'/_paypal/',0711);
 if(!is_dir('../../data/_sdata-'.$sdata.'/_paypal/tmp/')) mkdir('../../data/_sdata-'.$sdata.'/_paypal/tmp/');
-include('lang/lang.php');
 // ********************* actions *************************************************************************
-if (isset($_POST['action']))
-	{
-	switch ($_POST['action'])
-		{
+if(isset($_POST['action'])) {
+	switch ($_POST['action']) {
 		// ********************************************************************************************
 		case 'plugin': ?>
 		<link rel="stylesheet" type="text/css" media="screen" href="uno/plugins/paypal/paypal.css" />
@@ -24,16 +22,10 @@ if (isset($_POST['action']))
 			<h2><?php echo T_("Paypal");?></h2>
 			<div id="paypalConfig" style="display:none;">
 				<img style="float:right;margin:10px;" src="uno/plugins/paypal/img/paypalLogo.png" />
-				<p><?php echo T_("This plugin allows you to add different Paypal buttons in your website.");?></p>
-				<p><?php echo T_("It is used with the button") .'<img src="uno/plugins/paypal/ckpaypal/icons/ckpaypal.png" style="border:1px solid #aaa;padding:3px;margin:0 6px -5px;border-radius:2px;" />' . T_("added to the text editor when the plugin is enabled.");?></p>
+				<p><?php echo T_("This plugin allows you to add the Paypal payment gateway to the Payment plugin.");?></p>
 				<p><?php echo T_("Create your account on");?>&nbsp;<a href='https://www.paypal.com/'>Paypal</a>.</p>
 				<h3><?php echo T_("Default Settings :");?></h3>
 				<table class="hForm">
-					<tr>
-						<td><label><?php echo T_("Activate");?></label></td>
-						<td><input type="checkbox" class="input" name="activ" id="activ" /></td>
-						<td><em><?php echo T_("Enable the payment with Paypal");?></em></td>
-					</tr>
 					<tr>
 						<td><label><?php echo T_("Email or Paypal ID");?></label></td>
 						<td><input type="text" class="input" name="payMail" id="payMail" style="width:150px;" /></td>
@@ -66,58 +58,9 @@ if (isset($_POST['action']))
 						<td><em><?php echo T_("What is the currency of payment.");?></em></td>
 					</tr>
 					<tr>
-						<td><label><?php echo T_("Tax rate (%)");?></label></td>
-						<td><input type="text" class="input" name="payTax" id="payTax" style="width:100px;" /></td>
-						<td><em><?php echo T_("Tax rate in your country for the payment (%). Will be added to prices.");?></em></td>
-					</tr>
-					<tr>
-						<td><label><?php echo T_("Appearance");?></label></td>
-						<td>
-							<select name="payApp" id="payApp" onChange="f_btn_paypal();">
-								<option value="CC_LG"><?php echo T_("Standard with flags");?></option>
-								<option value="_LG"><?php echo T_("Standard");?></option>
-								<option value="_SM"><?php echo T_("Small");?></option>
-							</select>
-						</td>
-						<td>
-							<img id="payCC_LG" src="uno/plugins/paypal/img/btnCC_LG.gif" alt="<?php echo T_("Standard with flags");?>" />
-							<img id="pay_LG" style="display:none;" src="uno/plugins/paypal/img/btn_LG.gif" alt="<?php echo T_("Standard with flags");?>" />
-							<img id="pay_SM" style="display:none;" src="uno/plugins/paypal/img/btn_SM.gif" alt="<?php echo T_("Standard with flags");?>" />
-						</td>
-					</tr>
-					<tr>
-						<td><label><?php echo T_("Selling");?></label></td>
-						<td>
-							<select name="paySel" id="paySel">
-								<option value="products"><?php echo T_("products");?></option>
-								<option value="services"><?php echo T_("services");?></option>
-							</select>
-						</td>
-						<td><em><?php echo T_("Define what are you selling (only buy button).");?></em></td>
-					</tr>
-					<tr>
-						<td><label><?php echo T_("Donation value");?></label></td>
-						<td>
-							<select name="payDon" id="payDon">
-								<option value="1"><?php echo T_("fixed");?></option>
-								<option value="0"><?php echo T_("free");?></option>
-							</select>
-						</td>
-						<td><em><?php echo T_("Define a value for donation or let the client choose (only donate button).");?></em></td>
-					</tr>
-					<tr>
 						<td><label><?php echo T_("Notify URL");?></label></td>
-						<td style="vertical-align:middle;padding:10px;"><?php echo substr($_SERVER['HTTP_REFERER'],0,-4).'/plugins/paypal/ipn.php';?></td>
+						<td><?php echo substr($_SERVER['HTTP_REFERER'],0,-4).'/plugins/paypal/ipn.php';?></td>
 						<td><em><?php echo T_("Local File for Paypal Instant Payment Notification (IPN)"); ?></em></td>
-					</tr>
-				</table>
-				<br />
-				<h3><?php echo T_("Options :");?></h3>
-				<table class="hForm">
-					<tr>
-						<td><label><?php echo T_("No Paypal button");?></label></td>
-						<td><input type="checkbox" name="ckpaypaloff" id="ckpaypaloff" /></td>
-						<td><em><?php echo T_("You don't want to use the CKEditor Paypal Button.");?></em></td>
 					</tr>
 				</table>
 				<br />
@@ -134,14 +77,16 @@ if (isset($_POST['action']))
 						<td><em><?php echo T_("When publishing : Production = Real payment ; Test = Dummy payment to test account.");?></em></td>
 					</tr>
 					<tr>
-						<td><label><?php echo T_("Popup");?></label></td>
+						<td><label><?php echo T_("Lang");?></label></td>
 						<td>
-							<select name="payPop" id="payPop">
-								<option value="0"><?php echo T_("No");?></option>
-								<option value="1"><?php echo T_("Yes");?></option>
+							<select name="paylang" id="payLang">
+								<option value=""><?php echo T_("Current language").' ('.$lang.')';?></option>
+								<option value="en"><?php echo T_("English");?></option>
+								<option value="fr"><?php echo T_("French");?></option>
+								<option value="es"><?php echo T_("Spanish");?></option>
 							</select>
 						</td>
-						<td><em><?php echo T_("Open Paypal in a new small windows. Allow visitor to keep an eye on your website.");?></em></td>
+						<td><em><?php echo T_("Select the language to use in the form.");?></em></td>
 					</tr>
 				</table>
 				<div class="bouton fr" onClick="f_save_paypal();" title="<?php echo T_("Save settings");?>"><?php echo T_("Save");?></div>
@@ -154,33 +99,27 @@ if (isset($_POST['action']))
 		<?php break;
 		// ********************************************************************************************
 		case 'save':
-		$q = file_get_contents('../../data/busy.json'); $a = json_decode($q,true); $home = $a['nom'];
-		$q = @file_get_contents('../../data/paypal.json');
-		if($q) $a = json_decode($q,true);
-		else $a = Array();
-		$a['act'] = $_POST['act'];
-		if(file_exists('../../data/payment.json'))
-			{
+		$a = Array();
+		if(file_exists('../../data/paypal.json')) {
+			$q = file_get_contents('../../data/paypal.json');
+			if($q) $a = json_decode($q,true);
+		}
+		if(file_exists('../../data/payment.json')) { // idem paypalMake2.php
 			$q = file_get_contents('../../data/payment.json'); $b = json_decode($q,true);
-			if(empty($b['method'])) $b['method'] = array();
-			$b['method']['paypal'] = $_POST['act'];
-			file_put_contents('../../data/payment.json',json_encode($b));
-			}
-		$a['mail'] = $_POST['mail'];
+			if(empty($b['method'])) $b['method'] = array('paypal'=>1);
+			else if(empty($b['method']['paypal'])) $b['method']['paypal'] = 1;
+			else $b = 0;
+			if($b) file_put_contents('../../data/payment.json',json_encode($b));
+		}
+		$a['mail'] = strip_tags($_POST['mail']);
 		$a['ssl'] = ($_POST['ssl']?1:0);
 		$a['curr'] = $_POST['curr'];
-		$a['tax'] = ($_POST['tax']?$_POST['tax']:0);
-		$a['app'] = $_POST['app'];
-		$a['mod'] = $_POST['mod'];
-		$a['pop'] = $_POST['pop'];
-		$a['sel'] = $_POST['sel'];
-		$a['don'] = ($_POST['don']?$_POST['don']:0);
+		$a['mod'] = strip_tags($_POST['mod']);
 		$a['url'] = substr($_SERVER['HTTP_REFERER'],0,-4).'/plugins/paypal/ipn.php';
-		$a['home'] = substr($_SERVER['HTTP_REFERER'],0,-7).($home?$home:'index').'.html';
-		$a['lang5'] = (isset($langPlug[$lang])?substr($langPlug[$lang],0,5):'en_US');
-		$a['ckpaypaloff'] = ($_POST['ckpaypaloff']?1:0);
+		$a['home'] = substr($_SERVER['HTTP_REFERER'],0,-7).$busy.'.html';
+		$a['lng'] = strip_tags($_POST['lng']);
 		$out = json_encode($a);
-		if (file_put_contents('../../data/paypal.json', $out)) echo T_('Backup performed');
+		if(file_put_contents('../../data/paypal.json', $out)) echo T_('Backup performed');
 		else echo '!'.T_('Impossible backup');
 		break;
 		// ********************************************************************************************
@@ -195,40 +134,33 @@ if (isset($_POST['action']))
 				#paypalVente .paypalArchiv{width:16px;height:16px;margin:0 auto;background-position:-112px -96px;cursor:pointer;background-image:url("'.$_POST['udep'].'includes/img/ui-icons_444444_256x240.png")}
 			</style>';
 		$tab = array(); $d = '../../data/_sdata-'.$sdata.'/_paypal/';
-		if($dh=opendir($d))
-			{
+		if($dh=opendir($d)) {
 			while(($file = readdir($dh))!==false) { if ($file!='.' && $file!='..') $tab[]=$d.$file; }
 			closedir($dh);
-			}
-		if(count($tab))
-			{
+		}
+		if(count($tab)) {
 			echo '<br /><table>';
 			echo '<tr><th>'.T_("Date").'</th><th>'.T_("Type").'</th><th>'.T_("Name").'</th><th>'.T_("Address").'</th><th>'.T_("Article").'</th><th>'.T_("Price").'</th><th>'.T_("Treated").'</th><th>('.T_("Del").')</th><th>'.T_("Archive").'</th></tr>';
 			$b = array();
-			foreach($tab as $r)
-				{
+			foreach($tab as $r) {
 				$q = @file_get_contents($r);
 				$a = json_decode($q,true);
 				$b[] = $a;
-				}
+			}
 			function sortTime($u1,$u2) {return (isset($u2['time'])?$u2['time']:0) - (isset($u1['time'])?$u1['time']:0);}
 			usort($b, 'sortTime');
-			foreach($b as $r)
-				{
-				if($r)
-					{
+			foreach($b as $r) {
+				if($r) {
 					$typ = '';
 					if(isset($r['custom']) && strpos($r['custom'],'DIGITAL|')!==false) $typ = '<br />(Digital)';
 					$item = ((isset($r['item_number'])&&$r['item_number'])?$r['item_number'].' : ':'').((isset($r['item_name']) && isset($r['quantity']))?$r['item_name'].(($r['quantity']!="0")?' ('.$r['quantity'].')':''):'');
-					if(!$item)
-						{
+					if(!$item) {
 						$v = 1;
-						while(isset($r['item_name'.$v]))
-							{
+						while(isset($r['item_name'.$v])) {
 							$item .= ($item?'<br />':'').((isset($r['item_number'.$v])&&$r['item_number'.$v])?$r['item_number'.$v].' : ':'').$r['item_name'.$v].' ('.$r['quantity'.$v].')';
 							++$v;
-							}
 						}
+					}
 					echo '<tr'.($r['treated']?' class="PayTreatedYes"':'').'>';
 					echo '<td>'.(isset($r['time'])?date("dMy H:i", $r['time']):'').'<br /><span style="font-size:.8em;text-decoration:underline;cursor:pointer;" onClick="f_paypalDetail(\''.$r['txn_id'].'\')">'.$r['txn_id'].'</span></td>';
 					echo '<td style="text-align:center">'.(isset($r['subscr_id'])?'Sub':((isset($r['quantity'])&&$r['quantity']=="0")?'Don':'Pay')).$typ.'<br />'.((isset($r['IpnMethod'])&&$r['IpnMethod']=='not controled')?'<span style="font-size:.9em;color:#300;">'.T_("Unsafe").'</span>':'').'</td>';
@@ -241,22 +173,24 @@ if (isset($_POST['action']))
 					else echo '<td></td>';
 					echo '<td><div class="paypalArchiv" onClick="f_archivOrderPaypal(\''.$r['txn_id'].'\',\''.T_("Are you sure ?").'\')"></div></td>';
 					echo '</tr>';
-					}
 				}
-			echo '</table>';
 			}
+			echo '</table>';
+		}
 		break;
 		// ********************************************************************************************
 		case 'treated':
-		$q = @file_get_contents('../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['id'].'.json');
-		if($q)
-			{
-			$a = json_decode($q,true);
-			$a['treated'] = 1;
+		if(file_exists('../../data/_sdata-'.$sdata.'/_paypal/'.strip_tags($_POST['id']).'.json')) {
+			$q = file_get_contents('../../data/_sdata-'.$sdata.'/_paypal/'.strip_tags($_POST['id']).'.json');
+			if($q) {
+				$a = json_decode($q,true);
+				$a['treated'] = 1;
+				$out = json_encode($a);
+				if(file_put_contents('../../data/_sdata-'.$sdata.'/_paypal/'.strip_tags($_POST['id']).'.json', $out)) echo T_('Treated');
+				exit;
 			}
-		$out = json_encode($a);
-		if(file_put_contents('../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['id'].'.json', $out)) echo T_('Treated');
-		else echo '!'.T_('Error');
+		}
+		echo '!'.T_('Error');
 		break;
 		// ********************************************************************************************
 		case 'restaur':
@@ -271,14 +205,13 @@ if (isset($_POST['action']))
 		case 'archiv':
 		$p = '../../data/_sdata-'.$sdata.'/_paypal/archive';
 		if(!is_dir($p)) mkdir($p,0711);
-		$d = $_POST['id'].'.json';
+		$d = strip_tags($_POST['id']).'.json';
 		$q = file_get_contents('../../data/_sdata-'.$sdata.'/_paypal/'.$d);
 		if($q) $a = json_decode($q,true);
 		else $a = array();
-		if(!empty($a['time']) && !empty($a['mc_gross']))
-			{
+		if(!empty($a['time']) && !empty($a['mc_gross'])) {
 			$d1 = substr($d,0,-5).'__'.$a['time'].'__'.str_replace('.','',$a['mc_gross']).'__.json';
-			}
+		}
 		else $d1 = $d;
 		if(file_exists('../../data/_sdata-'.$sdata.'/_paypal/'.$d) && rename('../../data/_sdata-'.$sdata.'/_paypal/'.$d, $p.'/'.$d1)) echo T_('Archived');
 		else echo '!'.T_('Error');
@@ -286,90 +219,77 @@ if (isset($_POST['action']))
 		// ********************************************************************************************
 		case 'viewArchiv':
 		$p = '../../data/_sdata-'.$sdata.'/_paypal/archive';
-		if(is_dir($p) && $h=opendir($p))
-			{
+		if(is_dir($p) && $h=opendir($p)) {
 			$b = array();
-			while(($d=readdir($h))!==false)
-				{
+			while(($d=readdir($h))!==false) {
 				$ext = explode('.',$d);
 				$ext = $ext[count($ext)-1];
-				if($d!='.' && $d!='..' && $ext=='json')
-					{
-					if(strpos($d,'__')!==false)
-						{
+				if($d!='.' && $d!='..' && $ext=='json') {
+					if(strpos($d,'__')!==false) {
 						$a = explode('__',$d);
 						if(count($a)>2) $b[] = array('txn_id'=>$a[0], 'time'=>$a[1], 'mc_gross'=>$a[2], 'file'=>$d);
-						}
-					else
-						{
+					}
+					else {
 						$q = file_get_contents($p.'/'.$d);
 						if($q) $a = json_decode($q,true);
 						else $a = array();
-						if(!empty($a['time']) && !empty($a['mc_gross']))
-							{
+						if(!empty($a['time']) && !empty($a['mc_gross'])) {
 							$d1 = substr($d,0,-5).'__'.$a['time'].'__'.str_replace('.','',$a['mc_gross']).'__.json';
 							rename($p.'/'.$d, $p.'/'.$d1);
-							}
 						}
-					
 					}
 				}
+			}
 			closedir($h);
 			usort($b, function($f,$g) { return $g['time'] - $f['time'];});
 			$o = '<div id="paypalArchData"></div><div>';
-			foreach($b as $r)
-				{
+			foreach($b as $r) {
 				$o .= '<div class="paypalListArchiv" onClick="f_paypalViewA(\''.$r['file'].'\');">'.$r['txn_id'].' - '.date('dMy',$r['time']).' - '.substr($r['mc_gross'],0,-2).'&euro;</div>';
-				}
-			echo $o.'</div><div style="clear:left;"></div>';
 			}
+			echo $o.'</div><div style="clear:left;"></div>';
+		}
 		break;
 		// ********************************************************************************************
 		case 'viewA':
-		if(isset($_POST['arch']) && file_exists('../../data/_sdata-'.$sdata.'/_paypal/archive/'.$_POST['arch']))
-			{
-			$q = @file_get_contents('../../data/_sdata-'.$sdata.'/_paypal/archive/'.$_POST['arch']);
+		if(isset($_POST['arch']) && file_exists('../../data/_sdata-'.$sdata.'/_paypal/archive/'.$_POST['arch'])) {
+			$q = @file_get_contents('../../data/_sdata-'.$sdata.'/_paypal/archive/'.strip_tags($_POST['arch']));
 			$a = json_decode($q,true);
 			$o = '<h3>'.T_('Archives').'</h3><table class="paypalTO">';
-			foreach($a as $k=>$v)
-				{
+			foreach($a as $k=>$v) {
 				if($k=='time') $v .= ' => '.date("d/m/Y H:i",$v);
 				$o .= '<tr><td>'.$k.'</td><td>'.(is_array($v)?json_encode($v):$v).'</td></tr>';
-				}
-			echo $o.'</table><div class="bouton fr" onClick="f_paypalRestaurOrder(\''.$_POST['arch'].'\');" title="'.T_("Restore").'">'.T_("Restore").'</div><div style="clear:both;"></div>';
 			}
+			echo $o.'</table><div class="bouton fr" onClick="f_paypalRestaurOrder(\''.strip_tags($_POST['arch']).'\');" title="'.T_("Restore").'">'.T_("Restore").'</div><div style="clear:both;"></div>';
+		}
 		break;
 		// ********************************************************************************************
 		case 'detail':
-		if(isset($_POST['id']) && file_exists('../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['id'].'.json'))
-			{
-			$q = @file_get_contents('../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['id'].'.json');
+		if(isset($_POST['id']) && file_exists('../../data/_sdata-'.$sdata.'/_paypal/'.strip_tags($_POST['id']).'.json')) {
+			$q = @file_get_contents('../../data/_sdata-'.$sdata.'/_paypal/'.strip_tags($_POST['id']).'.json');
 			$a = json_decode($q,true);
 			$o = '<h3>'.T_('Payment Details').'</h3><table class="paypalTO">';
-			foreach($a as $k=>$v)
-				{
+			foreach($a as $k=>$v) {
 				if($k=='time') $v .= ' => '.date("d/m/Y H:i",$v);
 				$o .= '<tr><td>'.$k.'</td><td>'.(is_array($v)?json_encode($v):$v).'</td></tr>';
-				}
+			}
 			$o .= '</table>';
 			$o .= '<div class="bouton fr" '.((isset($a['treated']) && $a['treated']==0)?'style="display:none;"':'').' onClick="f_archivOrderPaypal(\''.$_POST['id'].'\',\''.T_("Are you sure ?").'\')" title="">'.T_("Archive").'</div>';
 			$o .= '<div style="clear:both;"></div>';
 			echo $o;
-			}
+		}
 		else echo '!'.T_('Error');
 		break;
 		// ********************************************************************************************
 		case 'suppsandbox':
-		if(file_exists('../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['file'].'.json'))
-			{
-			unlink('../../data/_sdata-'.$sdata.'/_paypal/'.$_POST['file'].'.json');
+		if(file_exists('../../data/_sdata-'.$sdata.'/_paypal/'.strip_tags($_POST['file']).'.json')) {
+			unlink('../../data/_sdata-'.$sdata.'/_paypal/'.strip_tags($_POST['file']).'.json');
 			echo T_('Removed');
-			}
+		}
 		else echo '!'.T_('Error');
 		break;
 		// ********************************************************************************************
-		}
+	}
 	clearstatcache();
 	exit;
-	}
+}
 ?>

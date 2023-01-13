@@ -4,10 +4,8 @@ if(!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQU
 <?php
 include(dirname(__FILE__).'/../../config.php');
 // ********************* actions *************************************************************************
-if(isset($_POST['action']))
-	{
-	switch($_POST['action'])
-		{
+if(isset($_POST['action'])) {
+	switch($_POST['action']) {
 		// ********************************************************************************************
 		case 'paypaldigit':
 		$r = (isset($_POST['r'])?preg_replace('/[^0-9]/','',$_POST['r']):0);
@@ -15,18 +13,16 @@ if(isset($_POST['action']))
 		$d = dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_paypal/tmp/';
 		@file_put_contents($d.'digit'.$r.'.txt', $ip);
 		$h = @opendir($d);
-		if($h)
-			{
-			while(($f=readdir($h))!==false)
-				{
+		if($h) {
+			while(($f=readdir($h))!==false) {
 				if($f=='.' || $f=='..') continue;
 				if(is_file($d.$f) && (substr($f,0,5)=='digit' || substr($f,0,9)=='acces-ipn') && filemtime($d.$f)<time()-86400) @unlink($d.$f); // 24h
-				}
-			@closedir($h);
 			}
+			@closedir($h);
+		}
 		break;
 		// ********************************************************************************************
-		}
-	exit;
 	}
+	exit;
+}
 ?>

@@ -23,15 +23,17 @@ u::::::::::::::u  n::::n    n::::n  o:::::ooooo:::::o
 
 ## Paypal ##
 
-Very powerful.
-Adds a button in CKEditor to create  as many Paypal buttons as you need.
-Pay, Add to Cart, View Cart, Donate and Subscribe are available.
-Sales are checked and recorded with IPN return. Works also with digital goods.
+Paypal gateway in addition to the Payment plugin.
+Sales are checked and recorded with IPN return.
+Works also with digital goods.
 
 [CMSUno](https://github.com/boiteasite/cmsuno)
 
 ### Versions ###
 
+* 1.4 - 13/01/2023 : 
+	* Remove Paypal button in CkEditor. You should now use Payment 'add to cart' button.
+	* JQuery free.
 * 1.3.1 - 27/09/2022 : Responsive display.
 * 1.3 - 15/11/2017 : Payment plugin Update
 * 1.2.4 - 19/05/2017 : Option to hide the CKEditor Paypal Button
