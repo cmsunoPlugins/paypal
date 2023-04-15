@@ -11,6 +11,7 @@ function f_save_paypal(){
 	let x=new FormData();
 	x.set('action','save');
 	x.set('unox',Unox);
+	x.set('ubusy',Ubusy);
 	x.set('mail',mail);
 	x.set('ssl',ssl);
 	x.set('curr',curr);
