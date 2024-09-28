@@ -31,6 +31,7 @@ Works also with digital goods.
 
 ### Versions ###
 
+* 1.5 - 28/09/2024 : Send email via SMTP if Newsletter plugin is SMTP
 * 1.4.1 - 15/04/2023 : Add post ubusy
 * 1.4 - 13/01/2023 : 
 	* Remove Paypal button in CkEditor. You should now use Payment 'add to cart' button.

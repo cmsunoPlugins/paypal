@@ -81,6 +81,14 @@ if($a && isset($_POST['txn_id'])) {
 							if(!is_dir($fi.'upload/')) mkdir($fi.'upload/');
 							if(!file_exists($fi.'upload/index.html')) file_put_contents($fi.'upload/index.html', '<html></html>');
 							if(file_exists($fi.$d[2].'/'.$b1[$Ubusy]['md'][$d[2]]['k'].$d[2].'.zip')) copy($fi.$d[2].'/'.$b1[$Ubusy]['md'][$d[2]]['k'].$d[2].'.zip',$fi.'upload/'.$d[3].$d[2].'.zip');
+							// Invoice with Invoice plugin
+							if(file_exists(dirname(dirname(__FILE__)).'/invoice/invoiceCreatePdf.php')) {  // INVOICE IN FILE ATTACHMENT - not implemented
+								//$invoice = array();
+								//include(dirname(dirname(__FILE__)).'/invoice/invoiceCreatePdf.php');
+								//$invPath = dirname(dirname(dirname(dirname(__FILE__)))).'/files/invoice/'.$invoice['file'];
+								//$invUrl = $b2['url'].'/files/invoice/'.$invoice['file'];
+							}
+							// Zip creation
 							$zip = new ZipArchive;
 							if($zip->open($fi.'upload/'.$d[3].$d[2].'.zip')===true) {
 								$zip->addFromString($d[2].'/key.php', '<?php $key = "'.$d[3].'"; ?>');
@@ -92,7 +100,12 @@ if($a && isset($_POST['txn_id'])) {
 							}
 							file_put_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/_digital/'.$d[3].$d[2].'.json', '{"t":"'.time().'","p":"paypal","d":"'.$d[2].'","k":"'.$d[3].'"}');
 							// link to zip in mail
-							$msg = $d[2].'.zip :<br />'."\r\n".'<a href="'.$b2['url'].'/files/upload/'.$d[3].$d[2].'.zip">'.$b2['url'].'/files/upload/'.$d[3].$d[2].'.zip</a>'."\r\n<br /><br />\r\n".T_('Thank you for your trust, see you soon!')."\r\n";
+							$msg = $d[2].'.zip :<br />'."\r\n".'<a href="'.$b2['url'].'/files/upload/'.$d[3].$d[2].'.zip">'.$b2['url'].'/files/upload/'.$d[3].$d[2].'.zip</a>'."\r\n<br /><br />\r\n";
+							if(isset($invUrl) && file_exists($invPath)) {
+								$msg .= '<a href="'.$invUrl.'">'.T_('Invoice').'</a><br />'."\r\n";
+								$msg .= '<br />'."\r\n";
+							}
+							$msg .= T_('Thank you for your trust, see you soon!')."\r\n";
 							// MAIL USER LINK TO ZIP
 							mailUser($_POST['payer_email'], 'Download - '.$d[2], $msg, $bottom, $top);
 						}
@@ -169,13 +182,22 @@ function VerifIXNID($txn_id,$sdata) {
 	return 0;
 }
 //
-function mailAdmin($tit, $msg, $bottom, $top, $url) {
-	global $mailAdmin;
-	$body = '<b><a href="'.$url.'/uno.php" style="color:#000000;">'.$tit.'</a></b><br />'."\r\n".$msg."\r\n";
+function mailAdmin($tit, $msg, $bottom, $top, $url=false, $attach=false) {
+	global $mailAdmin, $sdata, $Ukey;
+	if($url) $body = '<b><a href="'.$url.'/uno.php" style="color:#000000;">'.$tit.'</a></b><br />'."\r\n".$msg."\r\n";
+	else $body = $msg."\r\n";
 	$msgT = strip_tags($body);
 	$msgH = $top . $body . $bottom;
 	if(file_exists(dirname(__FILE__).'/../newsletter/PHPMailer/PHPMailerAutoload.php')) {
 		// PHPMailer
+		if(file_exists(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/newsletter.json')) {
+			$q = file_get_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/newsletter.json');
+			$news = json_decode($q,true);
+			if(!empty($news['gmp'])) {
+				$news['gmp'] = openssl_decrypt(base64_decode($news['gmp']), 'AES-256-CBC', substr($Ukey,0,32), OPENSSL_RAW_DATA, base64_decode($news['iv']));
+				$news['gmp'] = rtrim($news['gmp'], "\0");
+			}
+		}
 		require_once(dirname(__FILE__).'/../newsletter/PHPMailer/PHPMailerAutoload.php');
 		$phm = new PHPMailer();
 		$phm->CharSet = 'UTF-8';
@@ -186,6 +208,17 @@ function mailAdmin($tit, $msg, $bottom, $top, $url) {
 		$phm->Subject = stripslashes($tit);
 		$phm->Body = stripslashes($msgH);		
 		$phm->AltBody = stripslashes($msgT);
+		if($attach && file_exists($attach)) $phm->AddAttachment($attach);
+		if(!empty($news['met'])) { // SMTP
+			$phm->IsSMTP();
+			$phm->SMTPDebug = 0;  // debugging: 1 = errors and messages, 2 = messages only
+			$phm->SMTPAuth = true;  // authentication enabled
+			$phm->SMTPSecure = 'tls';
+			$phm->Port = 587; 
+			$phm->Host = ($news['met']=='gmail'?'smtp.gmail.com':$news['gmh']); // 'smtp.gmail.com'...
+			$phm->Username = $news['gma'];
+			$phm->Password = utf8_encode($news['gmp']);
+		}
 		if($phm->send()) return true;
 		else return false;
 	}
@@ -201,14 +234,22 @@ function mailAdmin($tit, $msg, $bottom, $top, $url) {
 	}
 }
 //
-function mailUser($dest, $tit, $msg, $bottom, $top, $url=false) {
-	global $mailAdmin;
+function mailUser($dest, $tit, $msg, $bottom, $top,  $url=false, $attach=false) {
+	global $mailAdmin, $sdata, $Ukey;
 	if($url) $body = '<b><a href="'.$url.'.html" style="color:#000000;">'.$tit.'</a></b><br />'."\r\n".$msg."\r\n";
 	else $body = "<b>".$tit."</b><br />\r\n".$msg."\r\n";
 	$msgT = strip_tags($body);
 	$msgH = $top . $body . $bottom;
 	if(file_exists(dirname(__FILE__).'/../newsletter/PHPMailer/PHPMailerAutoload.php')) {
 		// PHPMailer
+		if(file_exists(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/newsletter.json')) {
+			$q = file_get_contents(dirname(__FILE__).'/../../data/_sdata-'.$sdata.'/newsletter.json');
+			$news = json_decode($q,true);
+			if(!empty($news['gmp'])) {
+				$news['gmp'] = openssl_decrypt(base64_decode($news['gmp']), 'AES-256-CBC', substr($Ukey,0,32), OPENSSL_RAW_DATA, base64_decode($news['iv']));
+				$news['gmp'] = rtrim($news['gmp'], "\0");
+			}
+		}
 		require_once(dirname(__FILE__).'/../newsletter/PHPMailer/PHPMailerAutoload.php');
 		$phm = new PHPMailer();
 		$phm->CharSet = 'UTF-8';
@@ -219,6 +260,17 @@ function mailUser($dest, $tit, $msg, $bottom, $top, $url=false) {
 		$phm->Subject = stripslashes($tit);
 		$phm->Body = stripslashes($msgH);		
 		$phm->AltBody = stripslashes($msgT);
+		if($attach && file_exists($attach)) $phm->AddAttachment($attach);
+		if(!empty($news['met'])) { // SMTP
+			$phm->IsSMTP();
+			$phm->SMTPDebug = 0;  // debugging: 1 = errors and messages, 2 = messages only
+			$phm->SMTPAuth = true;  // authentication enabled
+			$phm->SMTPSecure = 'tls';
+			$phm->Port = 587; 
+			$phm->Host = ($news['met']=='gmail'?'smtp.gmail.com':$news['gmh']); // 'smtp.gmail.com'...
+			$phm->Username = $news['gma'];
+			$phm->Password = utf8_encode($news['gmp']);
+		}
 		if($phm->send()) return true;
 		else return false;
 	}
